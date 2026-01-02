@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Development Plan:** See [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for detailed implementation progress and roadmap.
 
+### Phase 1.6: Artisan Commands (2026-01-02) ✅
+- cms:make-model command for interactive content model generation
+- cms:generate-migrations command to auto-generate migrations for models
+- cms:cache-clear command to clear CMS-specific caches (models, translations, content)
+- cms:cache-warm command to pre-cache content for performance
+- Interactive prompts for model creation (label, icon, features, fields)
+- Support for all field types (string, text, integer, boolean, date, datetime, image, file, json, select)
+- Automatic migration generation after model creation
+- Model discovery from namespace and manual registration
+- Fresh flag to delete existing migrations before regeneration
+- Testing: ✅ 170 tests passing (439 assertions)
+  - 6 ClearCmsCache tests
+  - 6 GenerateCmsMigrations tests
+  - 6 MakeContentModel tests
+  - 5 WarmCache tests
+
 ### Phase 1.4 & 1.5: Base Content Model, Traits & Configuration (2026-01-02) ✅
 - BaseContent abstract class extending Eloquent Model
 - HasTranslations trait with 8 translation methods
