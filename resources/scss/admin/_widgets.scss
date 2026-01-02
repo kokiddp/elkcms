@@ -1,0 +1,38 @@
+/**
+ * Dashboard Widget Styles
+ */
+
+.dashboard-widget {
+    background: $white;
+    border-radius: $border-radius-md;
+    padding: $spacing-xl;
+    box-shadow: $shadow-sm;
+    transition: $transition-base;
+    height: 100%;
+
+    &:hover {
+        box-shadow: $shadow-md;
+    }
+}
+
+.widget-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $border-radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-xl;
+    margin-bottom: $spacing-lg;
+}
+
+.widget-value {
+    font-size: $font-size-2xl;
+    font-weight: bold;
+    margin-bottom: $spacing-md;
+}
+
+.widget-label {
+    color: $text-muted;
+    font-size: $font-size-sm;
+}

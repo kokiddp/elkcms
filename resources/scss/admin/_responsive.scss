@@ -1,0 +1,13 @@
+/**
+ * Responsive Styles
+ */
+
+@media (max-width: $breakpoint-md) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+    }
+
+    .admin-main {
+        margin-left: 0;
+    }
+}

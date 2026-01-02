@@ -1,0 +1,65 @@
+/**
+ * Sidebar Navigation Styles
+ */
+
+.admin-sidebar {
+    width: $sidebar-width;
+    background: $sidebar-bg;
+    color: $white;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: $transition-sidebar;
+    z-index: $z-index-sidebar;
+}
+
+.sidebar-brand {
+    padding: $spacing-xl $spacing-lg;
+    font-size: $font-size-xl;
+    font-weight: bold;
+    color: $white;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+        color: $sidebar-active;
+    }
+}
+
+// Sidebar menu
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: $spacing-lg 0;
+}
+
+.sidebar-menu-item {
+    margin: $spacing-sm $spacing-md;
+}
+
+.sidebar-menu-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem $spacing-lg;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    border-radius: $border-radius-sm;
+    transition: $transition-base;
+
+    &:hover {
+        background: $sidebar-hover;
+        color: $white;
+    }
+
+    &.active {
+        background: $sidebar-active;
+        color: $white;
+    }
+}
+
+.sidebar-menu-icon {
+    width: $font-size-lg;
+    margin-right: 0.75rem;
+    font-size: $font-size-lg;
+}

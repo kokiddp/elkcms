@@ -1,0 +1,53 @@
+/**
+ * Admin Layout Styles
+ */
+
+body {
+    font-family: $font-family-base;
+    background: $content-bg;
+}
+
+// Admin wrapper layout
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+// Main content area
+.admin-main {
+    flex: 1;
+    margin-left: $sidebar-width;
+    transition: $transition-sidebar;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+// Top header
+.admin-header {
+    height: $header-height;
+    background: $white;
+    border-bottom: 1px solid $border-color;
+    padding: 0 $spacing-xl;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: $z-index-header;
+}
+
+// Content area
+.admin-content {
+    flex: 1;
+    padding: $spacing-2xl;
+}
+
+// Footer
+.admin-footer {
+    padding: $spacing-lg $spacing-xl;
+    background: $white;
+    border-top: 1px solid $border-color;
+    color: $text-muted;
+    font-size: $font-size-sm;
+}
