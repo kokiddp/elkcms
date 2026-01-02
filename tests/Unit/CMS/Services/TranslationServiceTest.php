@@ -305,4 +305,51 @@ class TranslationServiceTest extends TestCase
         $this->assertGreaterThanOrEqual(2, $stats['total_translations']);
         $this->assertArrayHasKey('it', $stats['by_locale']);
     }
+
+    public function test_import_rejects_unauthorized_model_class(): void
+    {
+        // Attempt to import with a non-whitelisted model class
+        $json = json_encode([
+            'model_type' => 'App\\Models\\User', // Not a content model
+            'model_id' => 1,
+            'locale' => 'it',
+            'translations' => [
+                'name' => 'Hacker',
+            ],
+        ]);
+
+        $result = $this->service->importTranslations('json', $json);
+
+        // Should fail with error message
+        $this->assertArrayHasKey('errors', $result);
+        $this->assertCount(1, $result['errors']);
+        $this->assertStringContainsString('Invalid or unauthorized model class', $result['errors'][0]);
+        $this->assertEquals(0, $result['imported']);
+    }
+
+    public function test_import_accepts_whitelisted_model_class(): void
+    {
+        $post = TestPost::create([
+            'title' => 'English Title',
+            'status' => 'published',
+        ]);
+
+        // TestPost should be in the whitelist (it's in app/CMS/ContentModels)
+        $json = json_encode([
+            'model_type' => TestPost::class,
+            'model_id' => $post->id,
+            'locale' => 'it',
+            'translations' => [
+                'title' => 'Titolo Sicuro',
+            ],
+        ]);
+
+        $result = $this->service->importTranslations('json', $json);
+
+        // Should succeed
+        $this->assertEmpty($result['errors'], 'Should not have any errors');
+        $this->assertEquals(1, $result['imported']);
+        $post->refresh();
+        $this->assertEquals('Titolo Sicuro', $post->translate('title', 'it'));
+    }
 }
