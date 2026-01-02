@@ -274,4 +274,85 @@ class HasTranslationsTest extends TestCase
 
         $this->assertEquals(0, $translationCount);
     }
+
+    public function test_set_translation_throws_exception_for_unsupported_locale(): void
+    {
+        $this->model->setAttribute('title', 'English Title');
+        $this->model->setAttribute('status', 'published');
+        $this->model->save();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Locale 'xx' is not supported");
+
+        $this->model->setTranslation('title', 'xx', 'Invalid Translation');
+    }
+
+    public function test_set_translation_throws_exception_for_array_value(): void
+    {
+        $this->model->setAttribute('title', 'English Title');
+        $this->model->setAttribute('status', 'published');
+        $this->model->save();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Translation value must be a scalar type or null');
+
+        $this->model->setTranslation('title', 'it', ['array' => 'value']);
+    }
+
+    public function test_set_translation_throws_exception_for_object_value(): void
+    {
+        $this->model->setAttribute('title', 'English Title');
+        $this->model->setAttribute('status', 'published');
+        $this->model->save();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Translation value must be a scalar type or null');
+
+        $this->model->setTranslation('title', 'it', new \stdClass());
+    }
+
+    public function test_eager_loading_translations_prevents_n_plus_one(): void
+    {
+        // Create multiple posts with translations
+        $posts = [];
+        for ($i = 1; $i <= 3; $i++) {
+            $post = new \App\CMS\ContentModels\TestPost();
+            $post->setAttribute('title', "Post $i");
+            $post->setAttribute('status', 'published');
+            $post->save();
+            $post->setTranslation('title', 'it', "Articolo $i");
+            $posts[] = $post;
+        }
+
+        // Clear and enable query logging before eager loading
+        \DB::flushQueryLog();
+        \DB::enableQueryLog();
+
+        // Eager load translations
+        $loadedPosts = \App\CMS\ContentModels\TestPost::withTranslations('it')->get();
+
+        // Should execute 2 queries: 1 for posts + 1 for eager loading translations
+        $loadQueries = \DB::getQueryLog();
+        $this->assertCount(2, $loadQueries, 'Expected 2 queries: 1 for posts, 1 for eager-loaded translations');
+
+        // Clear query log and enable logging for accessing translations
+        \DB::flushQueryLog();
+        \DB::enableQueryLog();
+
+        // Access translations - should NOT trigger additional queries
+        foreach ($loadedPosts as $post) {
+            $post->getTranslations('title');
+        }
+
+        $accessQueries = \DB::getQueryLog();
+        \DB::disableQueryLog();
+
+        // Should have NO additional queries (already eager loaded)
+        $this->assertCount(0, $accessQueries, 'Expected no additional queries when accessing eager-loaded translations');
+
+        // Clean up
+        foreach ($posts as $post) {
+            $post->delete();
+        }
+    }
 }

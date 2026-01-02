@@ -60,9 +60,10 @@ trait OptimizedQueries
     {
         $locale = $locale ?? app()->getLocale();
 
-        // TODO: This will be implemented when Translation model exists (Phase 3)
-        // For now, just return the query
-        return $query;
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale)
+                ->select('translatable_id', 'translatable_type', 'locale', 'field', 'value');
+        }]);
     }
 
     /**

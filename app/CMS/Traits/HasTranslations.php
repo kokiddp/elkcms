@@ -77,6 +77,17 @@ trait HasTranslations
             throw new \InvalidArgumentException("Field '{$field}' is not translatable");
         }
 
+        // Validate locale is supported
+        $supportedLocales = array_keys(config('languages.supported', []));
+        if (! in_array($locale, $supportedLocales)) {
+            throw new \InvalidArgumentException("Locale '{$locale}' is not supported");
+        }
+
+        // Validate value type (must be scalar or null)
+        if (! is_scalar($value) && ! is_null($value)) {
+            throw new \InvalidArgumentException('Translation value must be a scalar type or null');
+        }
+
         // If default locale, set the attribute directly
         if ($locale === config('languages.default', 'en')) {
             $this->setAttribute($field, $value);
@@ -142,10 +153,20 @@ trait HasTranslations
             config('languages.default', 'en') => $this->getAttribute($field),
         ];
 
-        // Add database translations
-        $dbTranslations = $this->translations()
-            ->forField($field)
-            ->get();
+        if (! $this->exists) {
+            return $translations;
+        }
+
+        // Check if translations are already eager loaded (prevents N+1 queries)
+        if ($this->relationLoaded('translations')) {
+            $dbTranslations = $this->translations->where('field', $field);
+        } else {
+            // Lazy load only this field's translations with minimal columns
+            $dbTranslations = $this->translations()
+                ->forField($field)
+                ->select('locale', 'field', 'value')
+                ->get();
+        }
 
         foreach ($dbTranslations as $translation) {
             $translations[$translation->locale] = $translation->value;
