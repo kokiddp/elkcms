@@ -64,6 +64,29 @@ ELKCMS is a modern content management system that combines the power of Laravel 
 - **Automated Backups**: Scheduled backups to S3, Google Drive, etc.
 - **CSRF Protection**: Built-in security best practices
 
+## 📊 Development Progress
+
+> **Current Status:** Foundation Phase (Sprint 1) - In Progress
+
+ELKCMS is under active development. See [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for detailed implementation roadmap and progress tracking.
+
+### Completed ✅
+- **Phase 1.1:** PHP 8 Attributes System - Core attribute classes (ContentModel, Field, Relationship, SEO)
+- **Phase 1.2:** Model Scanner & Reflection System - Extract metadata from attributes with caching
+
+### In Progress 🔄
+- **Phase 1.3:** Migration Generator - Auto-generate Laravel migrations from models
+
+### Next Steps 📋
+- Base Content Model & Traits
+- Configuration Files
+- Artisan Commands
+- Translation System
+- Admin Panel
+- Frontend & SEO
+
+For the complete implementation plan with architecture decisions and timelines, see [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md).
+
 ## 📋 Requirements
 
 - PHP 8.2, 8.3, or 8.4
