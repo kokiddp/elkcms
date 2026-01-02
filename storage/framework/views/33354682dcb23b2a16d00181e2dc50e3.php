@@ -21,21 +21,16 @@
         </li>
 
         <li class="sidebar-menu-item">
-            <a href="#" class="sidebar-menu-link">
-                <i class="bi bi-file-earmark-text sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Pages</span>
-            </a>
-        </li>
-
-        <li class="sidebar-menu-item">
-            <a href="#" class="sidebar-menu-link">
+            <a href="<?php echo e(route('admin.content.index', ['modelType' => 'test-post'])); ?>"
+               class="sidebar-menu-link <?php echo e(request()->is('elk-cms/content/test-post*') ? 'active' : ''); ?>">
                 <i class="bi bi-newspaper sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Posts</span>
+                <span class="sidebar-menu-text">Test Posts</span>
             </a>
         </li>
 
         <li class="sidebar-menu-item">
-            <a href="#" class="sidebar-menu-link">
+            <a href="<?php echo e(route('admin.content.create', ['modelType' => 'test-post'])); ?>"
+               class="sidebar-menu-link <?php echo e(request()->is('elk-cms/content/*/create') ? 'active' : ''); ?>">
                 <i class="bi bi-plus-circle sidebar-menu-icon"></i>
                 <span class="sidebar-menu-text">Add New</span>
             </a>
