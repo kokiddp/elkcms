@@ -23,9 +23,10 @@ class ModelScanner
      */
     public function scan(string $modelClass, bool $useCache = true): array
     {
+        $cacheEnabled = config('cms.cache.enabled', true);
         $cacheKey = 'cms_model_scan_'.md5($modelClass);
 
-        if ($useCache && Cache::has($cacheKey)) {
+        if ($useCache && $cacheEnabled && Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
 
@@ -42,7 +43,7 @@ class ModelScanner
         ];
 
         // Cache the result for 1 hour
-        if ($useCache) {
+        if ($useCache && $cacheEnabled) {
             Cache::put($cacheKey, $definition, now()->addHour());
         }
 

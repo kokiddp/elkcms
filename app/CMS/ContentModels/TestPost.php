@@ -5,7 +5,6 @@ namespace App\CMS\ContentModels;
 use App\CMS\Attributes\ContentModel;
 use App\CMS\Attributes\Field;
 use App\CMS\Attributes\SEO;
-use Illuminate\Database\Eloquent\Model;
 
 #[ContentModel(
     label: 'Test Posts',
@@ -18,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
     sitemapPriority: '0.8',
     sitemapChangeFreq: 'weekly'
 )]
-class TestPost extends Model
+class TestPost extends BaseContent
 {
     #[Field(
         type: 'string',
