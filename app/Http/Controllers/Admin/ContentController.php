@@ -19,9 +19,6 @@ class ContentController extends Controller
         $this->scanner = $scanner;
     }
 
-    /**
-     * Display a listing of content for a specific model type.
-     */
     public function index(string $modelType): View
     {
         $modelClass = $this->getModelClass($modelType);
@@ -30,6 +27,7 @@ class ContentController extends Controller
         
         $contents = $repository
             ->orderBy('updated_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate(20);
 
         return view('admin.content.index', [
@@ -41,9 +39,6 @@ class ContentController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating new content.
-     */
     public function create(string $modelType): View
     {
         $modelClass = $this->getModelClass($modelType);
@@ -57,20 +52,15 @@ class ContentController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created content.
-     */
     public function store(Request $request, string $modelType): RedirectResponse
     {
         $modelClass = $this->getModelClass($modelType);
         $metadata = $this->scanner->scan($modelClass);
         
-        // Validate request
         $validated = $request->validate($this->getValidationRules($metadata));
 
         $repository = new ContentRepository($modelClass);
         
-        // Set default status if not provided
         if (!isset($validated['status'])) {
             $validated['status'] = 'draft';
         }
@@ -88,9 +78,6 @@ class ContentController extends Controller
             ->with('success', 'Content created successfully!');
     }
 
-    /**
-     * Show the form for editing content.
-     */
     public function edit(string $modelType, int $id): View
     {
         $modelClass = $this->getModelClass($modelType);
@@ -113,15 +100,11 @@ class ContentController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified content.
-     */
     public function update(Request $request, string $modelType, int $id): RedirectResponse
     {
         $modelClass = $this->getModelClass($modelType);
         $metadata = $this->scanner->scan($modelClass);
         
-        // Validate request
         $validated = $request->validate($this->getValidationRules($metadata));
 
         $repository = new ContentRepository($modelClass);
@@ -142,9 +125,6 @@ class ContentController extends Controller
             ->with('success', 'Content updated successfully!');
     }
 
-    /**
-     * Remove the specified content.
-     */
     public function destroy(string $modelType, int $id): RedirectResponse
     {
         $modelClass = $this->getModelClass($modelType);
@@ -167,12 +147,8 @@ class ContentController extends Controller
             ->with('success', 'Content deleted successfully!');
     }
 
-    /**
-     * Get the full class name for a model type.
-     */
     protected function getModelClass(string $modelType): string
     {
-        // Convert model type to class name (e.g., 'test-post' => 'TestPost')
         $className = str_replace('-', '', ucwords($modelType, '-'));
         $modelClass = "App\\CMS\\ContentModels\\{$className}";
 
@@ -183,9 +159,6 @@ class ContentController extends Controller
         return $modelClass;
     }
 
-    /**
-     * Extract validation rules from metadata.
-     */
     protected function getValidationRules(array $metadata): array
     {
         $rules = [];
@@ -195,6 +168,8 @@ class ContentController extends Controller
                 $rules[$fieldName] = $field['validation'];
             }
         }
+
+        $rules['status'] = 'nullable|string|in:draft,published,archived';
 
         return $rules;
     }

@@ -19,6 +19,18 @@ use App\CMS\Attributes\SEO;
 )]
 class TestPost extends BaseContent
 {
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected $fillable = ['title', 'content', 'featured_image', 'published_at', 'status'];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
+
     #[Field(
         type: 'string',
         label: 'Post Title',
@@ -26,25 +38,25 @@ class TestPost extends BaseContent
         translatable: true,
         maxLength: 200
     )]
-    public string $title;
+    protected string $title;
 
     #[Field(
         type: 'text',
         label: 'Post Content',
         translatable: true
     )]
-    public string $content;
+    protected string $content;
 
     #[Field(
         type: 'image',
         label: 'Featured Image',
         required: false
     )]
-    public ?string $featured_image;
+    protected ?string $featured_image = null;
 
     #[Field(
         type: 'datetime',
         label: 'Published At'
     )]
-    public ?\DateTime $published_at;
+    protected ?\DateTime $published_at = null;
 }

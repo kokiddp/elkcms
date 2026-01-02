@@ -116,7 +116,7 @@ class ModelScanner
     {
         $fields = [];
 
-        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED) as $property) {
             $attributes = $property->getAttributes(Field::class);
 
             if (empty($attributes)) {
@@ -161,7 +161,7 @@ class ModelScanner
     {
         $relationships = [];
 
-        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED) as $property) {
             $attributes = $property->getAttributes(Relationship::class);
 
             if (empty($attributes)) {

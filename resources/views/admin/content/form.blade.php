@@ -14,7 +14,7 @@
                    name="{{ $fieldName }}"
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
-                   value="{{ old($fieldName, $content->$fieldName ?? '') }}"
+                   value="{{ old($fieldName, isset($content) ? ($content->$fieldName ?? '') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}
                    @if($field['maxLength'])
                        maxlength="{{ $field['maxLength'] }}"
@@ -25,14 +25,14 @@
                       id="{{ $fieldName }}"
                       class="form-control @error($fieldName) is-invalid @enderror"
                       rows="6"
-                      {{ $field['required'] ? 'required' : '' }}>{{ old($fieldName, $content->$fieldName ?? '') }}</textarea>
+                      {{ $field['required'] ? 'required' : '' }}>{{ old($fieldName, isset($content) ? ($content->$fieldName ?? '') : '') }}</textarea>
 
         @elseif($field['type'] === 'integer' || $field['type'] === 'number')
             <input type="number"
                    name="{{ $fieldName }}"
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
-                   value="{{ old($fieldName, $content->$fieldName ?? '') }}"
+                   value="{{ old($fieldName, isset($content) ? ($content->$fieldName ?? '') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}>
 
         @elseif($field['type'] === 'boolean')
@@ -42,7 +42,7 @@
                        id="{{ $fieldName }}"
                        class="form-check-input @error($fieldName) is-invalid @enderror"
                        value="1"
-                       {{ old($fieldName, $content->$fieldName ?? false) ? 'checked' : '' }}>
+                       {{ old($fieldName, isset($content) ? ($content->$fieldName ?? false) : false) ? 'checked' : '' }}>
                 <label class="form-check-label" for="{{ $fieldName }}">
                     {{ $field['label'] }}
                 </label>
@@ -53,7 +53,7 @@
                    name="{{ $fieldName }}"
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
-                   value="{{ old($fieldName, $content->$fieldName ? $content->$fieldName->format('Y-m-d') : '') }}"
+                   value="{{ old($fieldName, isset($content) && isset($content) && isset($content->$fieldName) && $content->$fieldName ? $content->$fieldName->format('Y-m-d') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}>
 
         @elseif($field['type'] === 'datetime')
@@ -61,7 +61,7 @@
                    name="{{ $fieldName }}"
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
-                   value="{{ old($fieldName, $content->$fieldName ? $content->$fieldName->format('Y-m-d\TH:i') : '') }}"
+                   value="{{ old($fieldName, isset($content) && isset($content) && isset($content->$fieldName) && $content->$fieldName ? $content->$fieldName->format('Y-m-d\TH:i') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}>
 
         @elseif($field['type'] === 'image')
@@ -70,7 +70,7 @@
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
                    accept="image/*">
-            @if(isset($content->$fieldName) && $content->$fieldName)
+            @if(isset($content) && isset($content->$fieldName) && $content->$fieldName)
                 <div class="mt-2">
                     <img src="{{ asset('storage/' . $content->$fieldName) }}"
                          alt="{{ $field['label'] }}"
@@ -84,7 +84,7 @@
                    name="{{ $fieldName }}"
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
-                   value="{{ old($fieldName, $content->$fieldName ?? '') }}"
+                   value="{{ old($fieldName, isset($content) ? ($content->$fieldName ?? '') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}>
 
         @elseif($field['type'] === 'url')
@@ -92,7 +92,7 @@
                    name="{{ $fieldName }}"
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
-                   value="{{ old($fieldName, $content->$fieldName ?? '') }}"
+                   value="{{ old($fieldName, isset($content) ? ($content->$fieldName ?? '') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}>
 
         @else
@@ -101,7 +101,7 @@
                    name="{{ $fieldName }}"
                    id="{{ $fieldName }}"
                    class="form-control @error($fieldName) is-invalid @enderror"
-                   value="{{ old($fieldName, $content->$fieldName ?? '') }}"
+                   value="{{ old($fieldName, isset($content) ? ($content->$fieldName ?? '') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}>
         @endif
 

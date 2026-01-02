@@ -33,6 +33,15 @@ abstract class BaseContent extends Model
     protected $hidden = [];
 
     /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'published_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
      * Scope query to only published content
      */
     public function scopePublished($query)

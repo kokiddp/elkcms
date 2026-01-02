@@ -88,8 +88,8 @@ class ContentManagementTest extends TestCase
             ->get(route('admin.content.edit', ['modelType' => 'test-post', 'id' => $post->id]));
 
         $response->assertStatus(200);
-        $response->assertSee('Edit: Existing Post');
-        $response->assertSee('Existing content');
+        $response->assertSee('Edit: Existing Post', false);
+        $response->assertSee('Existing content', false);
     }
 
     public function test_admin_can_update_content(): void
@@ -167,9 +167,9 @@ class ContentManagementTest extends TestCase
             ->get(route('admin.content.index', ['modelType' => 'test-post']));
 
         $response->assertStatus(200);
-        $response->assertSee('Post 1');
-        $response->assertSee('Post 20');
-        $response->assertDontSee('Post 25'); // Should be on page 2
+        $response->assertSee('Post 25', false); // Most recent post (first on page 1)
+        $response->assertSee('Post 6', false);  // 20th post (last on page 1)
+        $response->assertDontSee('Post 5', false); // Should be on page 2
     }
 
     public function test_content_index_shows_status_badges(): void
