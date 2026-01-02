@@ -1,7 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
-/storage/*.key
+/public/build
 /vendor
 .env
 .env.backup
@@ -12,10 +12,36 @@ auth.json
 npm-debug.log
 yarn-error.log
 /.idea
+.DS_Store
+Thumbs.db
+
+# Storage - exclude everything except .gitignore and .gitkeep files
+/storage/*
+!/storage/app
+!/storage/framework
+!/storage/logs
+/storage/app/*
+!/storage/app/.gitignore
+!/storage/app/public
+/storage/app/public/*
+!/storage/app/public/.gitignore
+/storage/framework/*
+!/storage/framework/.gitignore
+!/storage/framework/cache
+!/storage/framework/sessions
+!/storage/framework/testing
+!/storage/framework/views
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+
 # Commit CMS migrations to git (architecture decision: generate once, commit)
 # /database/migrations/cms/*
 # !database/migrations/cms/.gitkeep
-.DS_Store
-Thumbs.db
-storage/framework/sessions/*
-!storage/framework/sessions/.gitignore
