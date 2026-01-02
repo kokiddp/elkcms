@@ -123,19 +123,23 @@ class TranslationService
         }
 
         $supportedLocales = array_keys(config('languages.supported', []));
+        $defaultLocale = config('languages.default', 'en');
+
+        // Optimize: Load all translations at once to prevent N+1 queries
+        $existingTranslations = $model->translations()
+            ->select('locale', 'field')
+            ->get()
+            ->groupBy('locale')
+            ->map(fn ($translations) => $translations->pluck('field')->toArray());
 
         foreach ($supportedLocales as $locale) {
-            if ($locale === config('languages.default', 'en')) {
+            if ($locale === $defaultLocale) {
                 continue; // Skip default locale
             }
 
-            $translatedFields = 0;
-
-            foreach ($model->getTranslatableFields() as $field) {
-                if ($model->hasTranslation($field, $locale)) {
-                    $translatedFields++;
-                }
-            }
+            // Count translated fields from pre-loaded data
+            $translatedFieldsList = $existingTranslations->get($locale, []);
+            $translatedFields = count(array_intersect($translatedFieldsList, $model->getTranslatableFields()));
 
             $percentage = $totalFields > 0
                 ? round(($translatedFields / $totalFields) * 100)
@@ -155,26 +159,28 @@ class TranslationService
      * Get models missing translations for a specific locale.
      *
      * @param  string  $locale
+     * @param  string|null  $modelClass  Optional specific model class, otherwise checks all models
      * @return Collection
      */
-    public function getMissingTranslations(string $locale): Collection
+    public function getMissingTranslations(string $locale, string $modelClass = null): Collection
     {
-        // Get all models with translations trait
-        $modelClass = config('cms.models.namespace', 'App\\CMS\\ContentModels').'\\TestPost';
-
-        if (! class_exists($modelClass)) {
-            return collect();
-        }
-
-        $allModels = $modelClass::all();
         $missing = collect();
+        $modelClasses = $modelClass ? [$modelClass] : $this->getAllowedModelClasses();
 
-        foreach ($allModels as $model) {
-            $progress = $this->getTranslationProgress($model);
+        foreach ($modelClasses as $class) {
+            if (! class_exists($class)) {
+                continue;
+            }
 
-            // Include if locale progress < 100% OR locale not in progress (no translations at all)
-            if (! isset($progress[$locale]) || $progress[$locale]['percentage'] < 100) {
-                $missing->push($model);
+            $allModels = $class::all();
+
+            foreach ($allModels as $model) {
+                $progress = $this->getTranslationProgress($model);
+
+                // Include if locale progress < 100% OR locale not in progress (no translations at all)
+                if (! isset($progress[$locale]) || $progress[$locale]['percentage'] < 100) {
+                    $missing->push($model);
+                }
             }
         }
 
@@ -205,21 +211,28 @@ class TranslationService
      * Warm translation cache for a locale.
      *
      * @param  string  $locale
-     * @return void
+     * @param  string|null  $modelClass  Optional specific model class, otherwise warms all models
+     * @return int  Number of models cached
      */
-    public function warmTranslationCache(string $locale): void
+    public function warmTranslationCache(string $locale, string $modelClass = null): int
     {
-        $modelClass = config('cms.models.namespace', 'App\\CMS\\ContentModels').'\\TestPost';
+        $count = 0;
+        $modelClasses = $modelClass ? [$modelClass] : $this->getAllowedModelClasses();
 
-        if (! class_exists($modelClass)) {
-            return;
+        foreach ($modelClasses as $class) {
+            if (! class_exists($class)) {
+                continue;
+            }
+
+            $models = $class::all();
+
+            foreach ($models as $model) {
+                $this->cacheTranslations($model, $locale);
+                $count++;
+            }
         }
 
-        $models = $modelClass::all();
-
-        foreach ($models as $model) {
-            $this->cacheTranslations($model, $locale);
-        }
+        return $count;
     }
 
     /**
@@ -345,6 +358,14 @@ class TranslationService
                 return $result;
             }
 
+            // Security: Validate model class against registered content models
+            $allowedModels = $this->getAllowedModelClasses();
+            if (! in_array($modelClass, $allowedModels)) {
+                $result['errors'][] = 'Invalid or unauthorized model class';
+
+                return $result;
+            }
+
             $model = $modelClass::find($modelId);
 
             if (! $model) {
@@ -415,5 +436,43 @@ class TranslationService
             $model->id,
             $locale
         );
+    }
+
+    /**
+     * Get list of allowed model classes for security validation.
+     *
+     * @return array
+     */
+    protected function getAllowedModelClasses(): array
+    {
+        $namespace = config('cms.models.namespace', 'App\\CMS\\ContentModels');
+        $registered = config('cms.models.registered', []);
+
+        // If explicit registration exists, use that
+        if (! empty($registered)) {
+            return $registered;
+        }
+
+        // Otherwise, scan the content models directory
+        $modelsPath = app_path('CMS/ContentModels');
+        $allowedModels = [];
+
+        if (is_dir($modelsPath)) {
+            $files = glob($modelsPath.'/*.php');
+            foreach ($files as $file) {
+                $className = basename($file, '.php');
+                $fullClass = $namespace.'\\'.$className;
+
+                if (class_exists($fullClass)) {
+                    // Skip abstract classes
+                    $reflection = new \ReflectionClass($fullClass);
+                    if (! $reflection->isAbstract()) {
+                        $allowedModels[] = $fullClass;
+                    }
+                }
+            }
+        }
+
+        return $allowedModels;
     }
 }
