@@ -3,6 +3,7 @@
 namespace App\CMS\Traits;
 
 use App\CMS\Reflection\ModelScanner;
+use App\Models\Translation;
 use Illuminate\Support\Facades\App;
 
 trait HasTranslations
@@ -11,6 +12,27 @@ trait HasTranslations
      * Cached translatable fields
      */
     protected ?array $translatableFieldsCache = null;
+
+    /**
+     * Boot the HasTranslations trait
+     */
+    protected static function bootHasTranslations(): void
+    {
+        // Delete translations when model is deleted
+        static::deleting(function ($model) {
+            $model->translations()->delete();
+        });
+    }
+
+    /**
+     * Get all translations for this model
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function translations()
+    {
+        return $this->morphMany(Translation::class, 'translatable');
+    }
 
     /**
      * Get translated value for a field
@@ -28,8 +50,16 @@ trait HasTranslations
             return $this->getAttribute($field);
         }
 
-        // TODO: This will be implemented when Translation model exists (Phase 3)
-        // For now, return the original field value
+        // Try to get translation from database
+        $translation = $this->translations()
+            ->forLocaleAndField($locale, $field)
+            ->first();
+
+        if ($translation) {
+            return $translation->value;
+        }
+
+        // Fallback to default locale value
         return $this->getAttribute($field);
     }
 
@@ -47,11 +77,27 @@ trait HasTranslations
             throw new \InvalidArgumentException("Field '{$field}' is not translatable");
         }
 
-        // TODO: This will be implemented when Translation model exists (Phase 3)
-        // For now, just set the attribute if it's the default locale
+        // If default locale, set the attribute directly
         if ($locale === config('languages.default', 'en')) {
             $this->setAttribute($field, $value);
+            return $this;
         }
+
+        // Make sure model exists in database before adding translations
+        if (! $this->exists) {
+            throw new \RuntimeException('Model must be saved before adding translations');
+        }
+
+        // Update or create translation
+        $this->translations()->updateOrCreate(
+            [
+                'locale' => $locale,
+                'field' => $field,
+            ],
+            [
+                'value' => $value,
+            ]
+        );
 
         return $this;
     }
@@ -74,8 +120,10 @@ trait HasTranslations
             return ! is_null($this->getAttribute($field));
         }
 
-        // TODO: This will be implemented when Translation model exists (Phase 3)
-        return false;
+        // Check if translation exists in database
+        return $this->translations()
+            ->forLocaleAndField($locale, $field)
+            ->exists();
     }
 
     /**
@@ -90,11 +138,20 @@ trait HasTranslations
             return [];
         }
 
-        // TODO: This will be implemented when Translation model exists (Phase 3)
-        // For now, return only the default locale value
-        return [
+        $translations = [
             config('languages.default', 'en') => $this->getAttribute($field),
         ];
+
+        // Add database translations
+        $dbTranslations = $this->translations()
+            ->forField($field)
+            ->get();
+
+        foreach ($dbTranslations as $translation) {
+            $translations[$translation->locale] = $translation->value;
+        }
+
+        return $translations;
     }
 
     /**
@@ -121,7 +178,14 @@ trait HasTranslations
      */
     public function deleteTranslations(string $field = null): self
     {
-        // TODO: This will be implemented when Translation model exists (Phase 3)
+        if ($field === null) {
+            // Delete all translations
+            $this->translations()->delete();
+        } else {
+            // Delete translations for specific field
+            $this->translations()->forField($field)->delete();
+        }
+
         return $this;
     }
 

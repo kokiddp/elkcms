@@ -20,7 +20,7 @@ class MigrationGenerator
      * Generate a Laravel migration file for a content model.
      *
      * @param  string  $modelClass  Fully qualified class name
-     * @param  string|null  $outputPath  Migration file output path (default: database/migrations/cms)
+     * @param  string|null  $outputPath  Migration file output path (default: database/migrations)
      * @return string Path to generated migration file
      *
      * @throws \ReflectionException
@@ -33,7 +33,7 @@ class MigrationGenerator
         $migrationName = 'create_'.$tableName.'_table';
         $className = Str::studly($migrationName);
 
-        $outputPath = $outputPath ?? database_path('migrations/cms');
+        $outputPath = $outputPath ?? database_path('migrations');
 
         if (! is_dir($outputPath)) {
             mkdir($outputPath, 0755, true);
@@ -169,7 +169,7 @@ PHP;
 
         $pivotTable = $relationship['pivotTable'] ?? $this->derivePivotTableName($definition, $relationship);
 
-        $outputPath = $outputPath ?? database_path('migrations/cms');
+        $outputPath = $outputPath ?? database_path('migrations');
 
         if (! is_dir($outputPath)) {
             mkdir($outputPath, 0755, true);

@@ -82,7 +82,7 @@ class GenerateCmsMigrations extends Command
         // Handle run flag
         if ($run || $this->confirm('Run migrations now?', false)) {
             $this->newLine();
-            $this->call('migrate', ['--path' => 'database/migrations/cms']);
+            $this->call('migrate');
         }
 
         return self::SUCCESS;
