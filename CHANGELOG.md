@@ -19,11 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic migration generation after model creation
 - Model discovery from namespace and manual registration
 - Fresh flag to delete existing migrations before regeneration
-- Testing: ✅ 170 tests passing (439 assertions)
+- Environment-aware cache handling (array cache in testing, file/database in production)
+- Testing: ✅ 171 tests passing (441 assertions)
   - 6 ClearCmsCache tests
   - 6 GenerateCmsMigrations tests
   - 6 MakeContentModel tests
-  - 5 WarmCache tests
+  - 6 WarmCache tests (including completion time verification)
 
 ### Phase 1.4 & 1.5: Base Content Model, Traits & Configuration (2026-01-02) ✅
 - BaseContent abstract class extending Eloquent Model
