@@ -134,7 +134,7 @@ class FieldAnalyzer
         $name = $fieldDefinition['name'] ?? 'field';
 
         $method = match ($type) {
-            'string' => $fieldDefinition['maxLength']
+            'string' => isset($fieldDefinition['maxLength']) && $fieldDefinition['maxLength']
                 ? "\$table->string('{$name}', {$fieldDefinition['maxLength']})"
                 : "\$table->string('{$name}')",
             'text' => "\$table->text('{$name}')",
