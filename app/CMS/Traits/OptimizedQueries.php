@@ -41,7 +41,7 @@ trait OptimizedQueries
 
         // Add relationships defined in model
         foreach ($modelData['relationships'] as $relationName => $relationData) {
-            if ($relationData['eagerLoad'] ?? false) {
+            if ($relationData['eager'] ?? false) {
                 $relations[] = $relationName;
             }
         }

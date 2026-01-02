@@ -206,10 +206,18 @@ class ModelScanner
     /**
      * Clear all cached model definitions.
      *
+     * WARNING: This method calls Cache::flush() which will clear ALL application cache,
+     * not just CMS model scans. This includes session cache, route cache, config cache, etc.
+     * Use with caution in production. For selective cache clearing, use clearCache($modelClass) instead.
+     *
+     * TODO: Implement cache tags (Redis/Memcached) or maintain a registry of scanned models
+     * to enable selective clearing of only CMS model scan cache.
+     *
      * @return void
      */
     public function clearAllCache(): void
     {
+        // ⚠️ This clears ALL cache, not just model scans
         Cache::flush();
     }
 }

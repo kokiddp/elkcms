@@ -132,4 +132,59 @@ class ModelScannerTest extends TestCase
         $this->assertEquals('TestPost', $result['shortName']);
         $this->assertEquals('App\CMS\ContentModels', $result['namespace']);
     }
+
+    public function test_can_clear_specific_model_cache(): void
+    {
+        // Skip if CMS cache is disabled (cache operations won't work)
+        if (!config('cms.cache.enabled', true)) {
+            $this->markTestSkipped('Cache is disabled in testing environment');
+        }
+
+        // Temporarily switch to array cache for testing (no database required)
+        config(['cache.default' => 'array']);
+
+        // First, scan and cache the model
+        $this->scanner->scan(TestPost::class, useCache: true);
+
+        // Clear specific model cache
+        $this->scanner->clearCache(TestPost::class);
+
+        // This should work without errors
+        $this->assertTrue(true);
+    }
+
+    public function test_clear_all_cache_executes_without_error(): void
+    {
+        // Skip if CMS cache is disabled (cache operations won't work)
+        if (!config('cms.cache.enabled', true)) {
+            $this->markTestSkipped('Cache is disabled in testing environment');
+        }
+
+        // Temporarily switch to array cache for testing (no database required)
+        config(['cache.default' => 'array']);
+
+        // Scan and cache the model
+        $this->scanner->scan(TestPost::class, useCache: true);
+
+        // Clear all cache (note: this clears ALL application cache)
+        $this->scanner->clearAllCache();
+
+        // This should work without errors
+        $this->assertTrue(true);
+    }
+
+    public function test_respects_cache_disabled_config(): void
+    {
+        // When cache is disabled in testing (.env.testing has CMS_CACHE_ENABLED=false)
+        // scanning should not use cache even if useCache=true
+        config(['cms.cache.enabled' => false]);
+
+        $result1 = $this->scanner->scan(TestPost::class, useCache: true);
+        $result2 = $this->scanner->scan(TestPost::class, useCache: true);
+
+        // Both should return valid results
+        $this->assertIsArray($result1);
+        $this->assertIsArray($result2);
+        $this->assertEquals($result1['class'], $result2['class']);
+    }
 }

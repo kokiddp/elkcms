@@ -45,4 +45,11 @@ class WarmCacheCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function test_shows_completion_time(): void
+    {
+        $this->artisan('cms:cache-warm')
+            ->expectsOutputToContain('Cache warming completed in')
+            ->assertExitCode(0);
+    }
 }
+
