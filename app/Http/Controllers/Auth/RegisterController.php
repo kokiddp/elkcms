@@ -39,6 +39,11 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Assign super-admin role to the first user
+        if (User::count() === 1) {
+            $user->assignRole('super-admin');
+        }
+
         event(new Registered($user));
 
         Auth::login($user);
