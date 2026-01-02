@@ -1,0 +1,99 @@
+{
+    "name": "elkcms/elkcms",
+    "type": "project",
+    "description": "A high-performance, attribute-driven PHP CMS built on Laravel",
+    "keywords": ["cms", "laravel", "content management", "multilanguage", "seo", "php"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gabriele Coquillard",
+            "email": "gabriele@elk-lab.com",
+            "homepage": "https://elk-lab.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/kokiddp/elkcms",
+    "support": {
+        "issues": "https://github.com/kokiddp/elkcms/issues",
+        "source": "https://github.com/kokiddp/elkcms",
+        "docs": "https://github.com/kokiddp/elkcms#readme"
+    },
+    "require": {
+        "php": "^8.2",
+        "guzzlehttp/guzzle": "^7.8",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^2.9",
+        "spatie/laravel-permission": "^6.9",
+        "doctrine/dbal": "^4.0",
+        "intervention/image": "^3.8",
+        "spatie/laravel-backup": "^9.1",
+        "spatie/laravel-activitylog": "^4.8"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/pint": "^1.17",
+        "laravel/sail": "^1.32",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.0",
+        "phpunit/phpunit": "^11.0",
+        "spatie/laravel-ignition": "^2.8",
+        "deployer/deployer": "^7.4",
+        "barryvdh/laravel-debugbar": "^3.13",
+        "larastan/larastan": "^2.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "cms:setup": [
+            "@php artisan migrate",
+            "@php artisan storage:link",
+            "@php artisan cms:make-admin"
+        ],
+        "test": [
+            "vendor/bin/phpunit"
+        ],
+        "format": [
+            "vendor/bin/pint"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
