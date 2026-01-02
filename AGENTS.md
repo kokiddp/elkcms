@@ -1,711 +1,655 @@
 # ELKCMS - Agent Implementation Guide
 
-This document provides detailed instructions for AI agents implementing ELKCMS. It breaks down the implementation into sequential, well-defined tasks that can be executed step-by-step.
+This document provides comprehensive instructions for AI agents implementing ELKCMS. It defines the development workflow, testing requirements, and documentation maintenance protocols that **MUST** be followed for every phase.
 
-## Implementation Philosophy
+## 🎯 Core Principles
 
-1. **Sequential Development**: Build foundation first, then add features
-2. **Test as You Go**: Verify each component works before moving on
-3. **Follow the Plan**: Refer to the main implementation plan for context
-4. **Incremental Complexity**: Start simple, add complexity gradually
+### 1. **Documentation-First Development**
+- **ALWAYS** update documentation files after implementing features
+- **NEVER** skip documentation updates
+- Documentation is as important as code
 
-## Phase 1: Project Foundation
+### 2. **Test-Driven Development**
+- Write comprehensive tests for **EVERY** new feature
+- Run full test suite **BEFORE** committing
+- Aim for 100% test coverage on critical components (Attributes, Reflection)
+- Minimum 80% coverage on all other components
 
-### Task 1.1: Initialize Laravel Project
+### 3. **Sequential Implementation**
+- Follow the exact order specified in [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)
+- Complete each phase fully before moving to the next
+- Verify all tests pass before proceeding
 
-**Objective**: Set up a fresh Laravel installation
+### 4. **Incremental Commits**
+- Commit after each completed phase
+- Use detailed commit messages following the standard format
+- Never batch multiple phases into one commit
 
-**Steps**:
-1. Run: `composer create-project laravel/laravel . --prefer-dist`
-2. Verify Laravel is installed: `php artisan --version`
-3. Generate app key: `php artisan key:generate`
-4. Configure `.env` file with database credentials
-5. Test database connection: `php artisan migrate`
+## 📋 Mandatory Development Workflow
 
-**Verification**:
-- Laravel welcome page loads at `http://localhost:8000`
-- No errors in `storage/logs/laravel.log`
+For **EVERY** phase/feature implementation, follow this exact workflow:
 
-### Task 1.2: Install PHP Dependencies
+### Step 1: Review Requirements
+1. Read the phase details in [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)
+2. Understand all requirements, methods, and testing criteria
+3. Check dependencies are met (previous phases complete)
+4. Create a todo list with specific tasks using `TodoWrite` tool
 
-**Objective**: Install required Composer packages
+### Step 2: Implement Features
+1. Create files in the exact order specified in the plan
+2. Follow the code examples and specifications exactly
+3. Use proper naming conventions (StudlyCase for classes, camelCase for methods)
+4. Add proper PHPDoc comments for all public methods
+5. Mark todo items as in_progress → completed as you work
 
-**Steps**:
+### Step 3: Write Comprehensive Tests
+1. Create unit tests for each new class/method
+2. Create feature tests for workflows (if applicable)
+3. Follow test naming convention: `test_{method}_{scenario}_{expected_result}`
+4. Aim for 100% code coverage on new features
+5. **Test files must be created in the same commit as the feature**
+
+### Step 4: Run Full Test Suite
+1. Execute: `docker exec elkcms_app php artisan test`
+2. **ALL tests must pass** - no exceptions
+3. If tests fail, fix issues before proceeding
+4. Verify test count increased appropriately
+
+### Step 5: Update Documentation (MANDATORY)
+**This step is CRITICAL and must NEVER be skipped!**
+
+Update these files **AFTER EVERY COMMIT**:
+
+#### 5.1 Update CHANGELOG.md
+```markdown
+### Phase X.Y: [Feature Name] (YYYY-MM-DD) ✅
+- Feature 1 description
+- Feature 2 description
+- Testing: ✅ X tests passing
+```
+
+#### 5.2 Update DEVELOPMENT_PLAN.md
+- Change phase status from `📋 PENDING` to `✅ COMPLETED`
+- Add commit hash
+- Add testing results
+- Update "Last Updated" date
+- Update "Current Phase" section
+- Update Git Commit History table
+
+#### 5.3 Update README.md
+- Move completed phase from "In Progress" to "Completed"
+- Update progress indicators (✅ 🔄 📋)
+- Update any feature descriptions if needed
+
+#### 5.4 Update Project Structure in DEVELOPMENT_PLAN.md
+- Mark completed files with ✅
+- Update test counts in Quick Reference section
+
+### Step 6: Commit Changes
+Use this exact commit format:
+
 ```bash
-composer require spatie/laravel-permission
-composer require doctrine/dbal
-composer require intervention/image
-composer require spatie/laravel-backup
-composer require spatie/laravel-activitylog
+git add -A
+git commit -m "{type}: {Short description} (Phase X.Y)
+
+{Detailed description of what was implemented}
+
+## {Section 1}
+- ✅ Feature 1
+- ✅ Feature 2
+
+## {Section 2}
+- Details...
+
+## Testing
+- ✅ X tests passing (Y assertions)
+- ✅ Full test suite passing
+
+## Documentation Updated
+- ✅ CHANGELOG.md
+- ✅ DEVELOPMENT_PLAN.md
+- ✅ README.md
+
+🦌 Generated with Claude Code
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ```
 
-**Verification**:
-- All packages installed without conflicts
-- `composer.json` contains all dependencies
+**Commit Types:**
+- `feat:` - New feature
+- `test:` - Adding tests
+- `docs:` - Documentation updates
+- `fix:` - Bug fixes
+- `refactor:` - Code refactoring
+- `perf:` - Performance improvements
+- `chore:` - Maintenance tasks
 
-### Task 1.3: Install Node Dependencies
+### Step 7: Verify Completion
+Before moving to next phase, verify:
+- ✅ All files created
+- ✅ All tests passing
+- ✅ All documentation updated
+- ✅ Git committed with proper message
+- ✅ No uncommitted changes
+- ✅ Todo list cleared for this phase
 
-**Objective**: Install required NPM packages
+## 📊 Test Requirements
 
-**Steps**:
-```bash
-npm install
-npm install bootstrap@5.3 @popperjs/core
-npm install grapesjs grapesjs-preset-webpage
-npm install sass
-npm install dropzone
-npm install chart.js
-npm install sortablejs
+### Unit Tests (Required for ALL Phases)
+
+**Coverage Requirements:**
+- **Attributes & Reflection:** 100% coverage (critical components)
+- **Services & Repositories:** 90% coverage
+- **Controllers & Views:** 80% coverage
+- **Traits & Helpers:** 90% coverage
+
+**Test Organization:**
+```
+tests/
+├── Unit/
+│   ├── CMS/
+│   │   ├── Attributes/         # 100% coverage required
+│   │   ├── Reflection/         # 100% coverage required
+│   │   ├── Traits/             # 90% coverage required
+│   │   ├── Services/           # 90% coverage required
+│   │   └── Repositories/       # 90% coverage required
+└── Feature/
+    └── CMS/
+        ├── ContentManagement/  # 80% coverage required
+        ├── Translation/        # 80% coverage required
+        ├── Media/              # 80% coverage required
+        ├── Admin/              # 80% coverage required
+        └── API/                # 80% coverage required
 ```
 
-**Verification**:
-- `package.json` contains all dependencies
-- `node_modules` folder created
-- No npm errors
-
-### Task 1.4: Create Directory Structure
-
-**Objective**: Set up the CMS directory structure
-
-**Steps**:
-Create these directories:
-```
-app/CMS/
-app/CMS/Attributes/
-app/CMS/ContentModels/
-app/CMS/Reflection/
-app/CMS/Services/
-app/CMS/Repositories/
-app/CMS/Builders/
-app/CMS/Traits/
-app/Http/Controllers/Admin/
-app/Http/Controllers/Frontend/
-app/View/Components/
-database/migrations/cms/
-resources/views/admin/
-resources/views/admin/layouts/
-resources/views/admin/content/
-resources/views/admin/content/fields/
-resources/views/admin/content/components/
-resources/views/admin/media/
-resources/views/admin/translations/
-resources/views/frontend/
-resources/views/frontend/layouts/
-resources/views/frontend/content/
-resources/views/frontend/blocks/
-resources/views/frontend/components/
-resources/views/frontend/partials/
-resources/js/admin/
-resources/js/admin/modules/
-resources/js/frontend/
-resources/scss/admin/
-resources/scss/admin/components/
-resources/scss/frontend/
-resources/scss/frontend/components/
-resources/scss/frontend/utilities/
-routes/
-```
-
-**Verification**:
-- All directories exist
-- Proper permissions (writable by web server)
-
-### Task 1.5: Create Configuration Files
-
-**Objective**: Set up CMS configuration files
-
-**File**: `config/cms.php`
+**Test Naming Convention:**
 ```php
-<?php
-
-return [
-    'cache' => [
-        'enabled' => env('CMS_CACHE_ENABLED', true),
-        'ttl' => env('CMS_CACHE_TTL', 3600),
-        'driver' => env('CMS_CACHE_DRIVER', 'file'), // file or database
-        'tags' => false, // file driver doesn't support tags
-    ],
-
-    'models' => [
-        'namespace' => 'App\\CMS\\ContentModels',
-        'scan_path' => app_path('CMS/ContentModels'),
-        'auto_migrate' => env('CMS_AUTO_MIGRATE', false),
-    ],
-
-    'media' => [
-        'disk' => 'public',
-        'image_sizes' => [
-            'thumbnail' => [150, 150],
-            'medium' => [300, 300],
-            'large' => [1024, 1024],
-            'xlarge' => [1920, 1920],
-        ],
-    ],
-
-    'admin' => [
-        'prefix' => 'admin',
-        'middleware' => ['web', 'auth', 'admin'],
-        'per_page' => 20,
-    ],
-];
-```
-
-**File**: `config/languages.php`
-```php
-<?php
-
-return [
-    'default' => env('LANGUAGE_DEFAULT', 'en'),
-    'fallback' => env('LANGUAGE_FALLBACK', 'en'),
-
-    'supported' => [
-        'en' => ['name' => 'English', 'flag' => '🇬🇧'],
-        'it' => ['name' => 'Italiano', 'flag' => '🇮🇹'],
-        'es' => ['name' => 'Español', 'flag' => '🇪🇸'],
-        'fr' => ['name' => 'Français', 'flag' => '🇫🇷'],
-    ],
-
-    'show_in_url' => true,
-    'hide_default' => false,
-];
-```
-
-**Verification**:
-- Files exist in `config/` directory
-- No syntax errors: `php artisan config:clear`
-
-## Phase 2: Core Content Model System
-
-### Task 2.1: Create PHP Attributes
-
-**Objective**: Build the attribute system for content models
-
-**File**: `app/CMS/Attributes/ContentModel.php`
-```php
-<?php
-
-namespace App\CMS\Attributes;
-
-use Attribute;
-
-#[Attribute(Attribute::TARGET_CLASS)]
-class ContentModel
+public function test_{method_name}_{scenario}_{expected_result}(): void
 {
-    public function __construct(
-        public string $label,
-        public string $icon = 'file',
-        public array $supports = ['translations', 'seo', 'media'],
-        public bool $hasSlug = true,
-        public bool $hierarchical = false,
-        public string $adminRoute = '',
-    ) {}
+    // Arrange
+    $model = new Model();
+
+    // Act
+    $result = $model->method();
+
+    // Assert
+    $this->assertEquals('expected', $result);
 }
 ```
 
-**File**: `app/CMS/Attributes/Field.php`
+**Examples:**
 ```php
-<?php
+test_can_create_content_model_attribute()
+test_generate_slug_from_title_returns_lowercase_slug()
+test_translate_missing_field_returns_fallback_value()
+test_upload_invalid_file_type_throws_exception()
+test_field_attribute_validates_sitemap_priority_min()
+```
 
-namespace App\CMS\Attributes;
+### Feature Tests (Required for Sprints)
 
-use Attribute;
+**When to Create:**
+- After completing a full sprint
+- For complete user workflows
+- For critical business logic
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
-class Field
+**Requirements:**
+- Test with real database (use transactions)
+- Test complete workflows start to finish
+- Test authentication and authorization
+- Test file uploads with temporary files
+
+**Example:**
+```php
+public function test_complete_content_creation_workflow(): void
 {
-    public function __construct(
-        public string $type,
-        public ?string $label = null,
-        public bool $translatable = false,
-        public bool $required = true,
-        public ?int $maxLength = null,
-        public ?int $minLength = null,
-        public ?array $options = null,
-        public ?string $default = null,
-        public bool $searchable = true,
-        public bool $sortable = true,
-        public bool $showInList = true,
-        public string $adminComponent = 'auto',
-    ) {}
+    // Create content in default language
+    $post = Post::create(['title' => 'Test Post']);
+
+    // Add translation
+    $post->setTranslation('title', 'it', 'Test Articolo');
+
+    // Publish content
+    $post->publish();
+
+    // Verify on frontend
+    $response = $this->get('/post/' . $post->slug);
+    $response->assertStatus(200);
+    $response->assertSee('Test Post');
 }
 ```
 
-**File**: `app/CMS/Attributes/Relationship.php`
-```php
-<?php
+### Integration Tests (Required for Sprint Completion)
 
-namespace App\CMS\Attributes;
+Test these complete workflows:
 
-use Attribute;
+1. **Content Creation Workflow**
+2. **Translation Workflow**
+3. **Media Upload & Processing Workflow**
+4. **Cache Warming & Retrieval Workflow**
+5. **SEO Metadata Generation Workflow**
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
-class Relationship
-{
-    public function __construct(
-        public string $type,
-        public string $model,
-        public ?string $pivot = null,
-        public ?array $fields = [],
-    ) {}
-}
+## 📝 Documentation Files to Update
+
+### CHANGELOG.md
+**When:** After every commit
+**What:** Add entry for completed phase with date, features, testing results
+
+**Format:**
+```markdown
+### Phase X.Y: [Feature Name] (2026-01-02) ✅
+- Feature 1 implemented
+- Feature 2 implemented
+- Testing: ✅ X tests passing (Y assertions)
 ```
 
-**File**: `app/CMS/Attributes/SEO.php`
-```php
-<?php
+### DEVELOPMENT_PLAN.md
+**When:** After every commit
+**What:** Update phase status, add commit hash, update progress
 
-namespace App\CMS\Attributes;
+**Changes Required:**
+1. Change phase header from `📋 PENDING` to `✅ COMPLETED`
+2. Add commit hash after phase title
+3. Update testing section with results
+4. Add any implementation notes
+5. Update "Last Updated" date at bottom
+6. Update "Current Phase" at bottom
+7. Update Git Commit History table
+8. Update Quick Reference test counts
 
-use Attribute;
+### README.md
+**When:** After every commit or major milestone
+**What:** Update development progress section
 
-#[Attribute(Attribute::TARGET_CLASS)]
-class SEO
-{
-    public function __construct(
-        public string $schemaType = 'WebPage',
-        public array $schemaProperties = [],
-        public bool $enableBreadcrumbs = true,
-        public bool $enableSitemap = true,
-        public ?string $sitemapPriority = '0.5',
-        public ?string $sitemapChangeFreq = 'weekly',
-    ) {}
-}
+**Changes Required:**
+1. Move completed item from "In Progress" to "Completed"
+2. Update progress indicators
+3. Update any relevant feature descriptions
+
+### Example Documentation Update Flow
+
+**Before Commit:**
+```markdown
+# DEVELOPMENT_PLAN.md
+### 📋 Phase 1.4: Base Content Model & Traits (PENDING)
+
+# CHANGELOG.md
+(no entry yet)
+
+# README.md
+### In Progress 🔄
+- **Phase 1.4:** Base Content Model & Traits
 ```
 
-**Verification**:
-- All attribute classes exist
-- No syntax errors
-- Can be imported without errors
+**After Commit:**
+```markdown
+# DEVELOPMENT_PLAN.md
+### ✅ Phase 1.4: Base Content Model & Traits (COMPLETED)
+**Commit:** `abc123d` - "feat: Implement Base Content Model & Traits (Phase 1.4)"
 
-### Task 2.2: Create ModelScanner
+**Testing:**
+- ✅ 30 tests passing (92 assertions)
+- ✅ Full test suite: 103 tests passing (301 assertions)
 
-**Objective**: Build the reflection engine that scans content models
+# CHANGELOG.md
+### Phase 1.4: Base Content Model & Traits (2026-01-02) ✅
+- BaseContent abstract class with status management
+- HasTranslations trait with fallback support
+- HasSlug trait with auto-generation
+- HasSEO trait with Schema.org integration
+- OptimizedQueries trait with eager loading
+- Testing: ✅ 30 new tests passing (92 assertions)
 
-**File**: `app/CMS/Reflection/ModelScanner.php`
+# README.md
+### Completed ✅
+- **Phase 1.1:** PHP 8 Attributes System
+- **Phase 1.2:** Model Scanner & Reflection System
+- **Phase 1.3:** Migration Generator
+- **Phase 1.4:** Base Content Model & Traits
 
-This is a CRITICAL file. Refer to the main implementation plan for the complete code.
+### In Progress 🔄
+- **Phase 1.5:** Configuration Files
+```
 
-**Key Methods**:
-- `scanModels(): array` - Scans all models in the ContentModels directory
-- `analyzeModel(string $className): array` - Extracts attributes from a single model
-- `getTableName(string $className): string` - Generates table name
+## 🔍 Code Quality Requirements
 
-**Verification**:
-- Create a test model
-- Run scanner: `$scanner = new ModelScanner(); $models = $scanner->scanModels();`
-- Verify it returns model metadata array
+### PHP Code Standards
 
-### Task 2.3: Create MigrationGenerator
+1. **Follow PSR-12** coding standard
+2. **Use strict types:** `declare(strict_types=1);` at top of files
+3. **Type hint everything:** Parameters, return types, properties
+4. **PHPDoc required** for all public methods
+5. **No unused imports**
+6. **No commented-out code** in commits
 
-**Objective**: Build the system that auto-generates migrations
-
-**File**: `app/CMS/Reflection/MigrationGenerator.php`
-
-Refer to main plan for complete implementation.
-
-**Key Methods**:
-- `generate(): array` - Generates migrations for all scanned models
-- `generateMigration(array $model): string` - Creates a single migration file
-- `getStub(array $model): string` - Generates migration code
-- `generateColumns(array $model): string` - Generates column definitions
-
-**Verification**:
-- Run: `$generator = new MigrationGenerator($scanner); $generator->generate();`
-- Check `database/migrations/cms/` for generated files
-- Verify migration syntax is valid
-
-### Task 2.4: Create Translation System
-
-**File**: `database/migrations/2024_01_01_000001_create_cms_translations_table.php`
+**Example:**
 ```php
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+declare(strict_types=1);
 
-return new class extends Migration
+namespace App\CMS\Services;
+
+use App\CMS\ContentModels\BaseContent;
+use Illuminate\Support\Collection;
+
+class ContentService
 {
-    public function up(): void
+    /**
+     * Create new content with translations.
+     *
+     * @param  string  $modelClass  Fully qualified class name
+     * @param  array  $data  Content data
+     * @param  array  $translations  Translation data by locale
+     * @return BaseContent
+     */
+    public function create(string $modelClass, array $data, array $translations = []): BaseContent
     {
-        Schema::create('cms_translations', function (Blueprint $table) {
-            $table->id();
-            $table->morphs('translatable');
-            $table->string('field');
-            $table->string('locale', 5);
-            $table->text('value');
-            $table->timestamps();
-
-            $table->index(['translatable_type', 'translatable_id', 'locale']);
-            $table->unique(['translatable_type', 'translatable_id', 'field', 'locale'], 'translation_unique');
-        });
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('cms_translations');
-    }
-};
-```
-
-**File**: `app/Models/Translation.php`
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Translation extends Model
-{
-    protected $table = 'cms_translations';
-
-    protected $fillable = [
-        'translatable_type',
-        'translatable_id',
-        'field',
-        'locale',
-        'value',
-    ];
-
-    public function translatable()
-    {
-        return $this->morphTo();
+        // Implementation
     }
 }
 ```
 
-**File**: `app/CMS/Traits/HasTranslations.php`
-
-Refer to main plan for complete implementation.
-
-**Key Methods**:
-- `translations()` - MorphMany relationship
-- `translate(string $field, string $locale)` - Get translation with fallback
-- `setTranslation(string $field, string $locale, mixed $value)` - Store translation
-
-**Verification**:
-- Run migration: `php artisan migrate`
-- Test translation storage and retrieval
-
-### Task 2.5: Create Base Traits
-
-**File**: `app/CMS/Traits/HasSlug.php`
-**File**: `app/CMS/Traits/HasSEO.php`
-**File**: `app/CMS/Traits/OptimizedQueries.php`
-
-Refer to main plan for implementations.
-
-**Verification**:
-- Each trait can be imported
-- Methods are callable
-
-### Task 2.6: Create BaseContent Model
-
-**File**: `app/CMS/ContentModels/BaseContent.php`
-
-```php
-<?php
-
-namespace App\CMS\ContentModels;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\CMS\Traits\{HasTranslations, HasSlug, HasSEO, OptimizedQueries};
-
-abstract class BaseContent extends Model
-{
-    use SoftDeletes, HasTranslations, HasSlug, HasSEO, OptimizedQueries;
-
-    protected $guarded = ['id'];
-
-    protected $casts = [
-        'published_at' => 'datetime',
-        'meta' => 'array',
-        'blocks_data' => 'array',
-    ];
-
-    public function scopePublished($query)
-    {
-        return $query->where('status', 'published')
-                    ->where('published_at', '<=', now());
-    }
-
-    public function scopeInLocale($query, string $locale)
-    {
-        return $query->with(['translations' => function ($q) use ($locale) {
-            $q->where('locale', $locale);
-        }]);
-    }
-}
-```
-
-**Verification**:
-- Class can be extended
-- Traits are properly loaded
-
-### Task 2.7: Create Example Content Models
-
-**File**: `app/CMS/ContentModels/Page.php`
-**File**: `app/CMS/ContentModels/Post.php`
-
-Refer to main plan for complete implementations.
-
-**Verification**:
-- Both models can be scanned by ModelScanner
-- Migrations can be generated for both
-- Migrations run successfully
-
-## Phase 3: Admin Panel Foundation
-
-### Task 3.1: Create Admin Middleware
-
-**File**: `app/Http/Middleware/AdminMiddleware.php`
-```php
-<?php
-
-namespace App\Http\Middleware;
-
-use Closure;
-use Illuminate\Http\Request;
-
-class AdminMiddleware
-{
-    public function handle(Request $request, Closure $next)
-    {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            return redirect('/')->with('error', 'Unauthorized access');
-        }
-
-        return $next($request);
-    }
-}
-```
-
-**Update**: `app/Http/Kernel.php`
-Add to `$middlewareAliases`:
-```php
-'admin' => \App\Http\Middleware\AdminMiddleware::class,
-```
-
-**Migration**: `database/migrations/XXXX_add_admin_to_users.php`
-```php
-public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->boolean('is_admin')->default(false);
-        $table->string('locale', 5)->default('en');
-        $table->json('preferences')->nullable();
-    });
-}
-```
-
-**Verification**:
-- Run migration
-- Middleware can be used in routes
-
-### Task 3.2: Create FormBuilder
-
-**File**: `app/CMS/Builders/FormBuilder.php`
-
-Refer to main plan for complete implementation. This is a CRITICAL component.
-
-**Key Methods**:
-- `buildForm(string $modelClass, $instance = null): array`
-- `buildValidationRules(string $modelClass): array`
-- `mapFieldType(array $field): string`
-
-**Verification**:
-- Can generate form array from a content model
-- Can generate Laravel validation rules
-
-### Task 3.3: Create Admin ContentController
-
-**File**: `app/Http/Controllers/Admin/ContentController.php`
-
-Refer to main plan for complete implementation.
-
-**Key Methods**:
-- `index(string $modelType)` - List all items
-- `create(string $modelType)` - Show create form
-- `store(Request $request, string $modelType)` - Save new item
-- `edit(string $modelType, int $id)` - Show edit form
-- `update(Request $request, string $modelType, int $id)` - Update item
-- `destroy(string $modelType, int $id)` - Delete item
-
-**Verification**:
-- Routes work
-- Can create/read/update/delete content
-
-### Task 3.4: Create Admin Routes
-
-**File**: `routes/admin.php`
-```php
-<?php
-
-use App\Http\Controllers\Admin\ContentController;
-use App\Http\Controllers\Admin\MediaController;
-use App\Http\Controllers\Admin\TranslationController;
-use Illuminate\Support\Facades\Route;
-
-// Dashboard
-Route::get('/', function () {
-    return view('admin.dashboard');
-})->name('admin.dashboard');
-
-// Content management
-Route::prefix('content')->name('content.')->group(function () {
-    Route::get('/{modelType}', [ContentController::class, 'index'])->name('index');
-    Route::get('/{modelType}/create', [ContentController::class, 'create'])->name('create');
-    Route::post('/{modelType}', [ContentController::class, 'store'])->name('store');
-    Route::get('/{modelType}/{id}/edit', [ContentController::class, 'edit'])->name('edit');
-    Route::put('/{modelType}/{id}', [ContentController::class, 'update'])->name('update');
-    Route::delete('/{modelType}/{id}', [ContentController::class, 'destroy'])->name('destroy');
-});
-
-// Media library
-Route::prefix('media')->name('media.')->group(function () {
-    Route::get('/', [MediaController::class, 'index'])->name('index');
-    Route::post('/upload', [MediaController::class, 'upload'])->name('upload');
-    Route::get('/{id}/edit', [MediaController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [MediaController::class, 'update'])->name('update');
-    Route::delete('/{id}', [MediaController::class, 'delete'])->name('delete');
-});
-
-// Translations
-Route::prefix('translations')->name('translations.')->group(function () {
-    Route::get('/', [TranslationController::class, 'dashboard'])->name('dashboard');
-    Route::get('/missing', [TranslationController::class, 'missing'])->name('missing');
-});
-```
-
-Update `app/Providers/RouteServiceProvider.php` to load admin routes.
-
-**Verification**:
-- Admin routes are registered
-- Middleware is applied
-- Can access admin panel
-
-(Continuing in next section due to length...)
-
-## Incremental Implementation Strategy
-
-For each subsequent phase:
-
-1. **Read the main plan** for that phase
-2. **Implement files sequentially** in the order specified
-3. **Test each component** before moving to the next
-4. **Verify dependencies** are met before starting a phase
-5. **Create simple tests** to ensure functionality
-6. **Document any deviations** from the plan
-
-## Critical Implementation Order
-
-These components MUST be implemented in this order:
-
-1. ✅ Attributes (ContentModel, Field, Relationship, SEO)
-2. ✅ ModelScanner (reads attributes)
-3. ✅ MigrationGenerator (uses ModelScanner output)
-4. ✅ Base traits (HasTranslations, HasSlug, HasSEO)
-5. ✅ BaseContent model (uses traits)
-6. ✅ Example models (Page, Post)
-7. ✅ FormBuilder (uses ModelScanner)
-8. ✅ Admin ContentController (uses FormBuilder)
-9. ✅ Admin views (uses FormBuilder output)
-10. ✅ Frontend system (displays content)
-
-## Testing Checkpoints
-
-After each phase, verify:
-
-- **Phase 1**: Laravel is running, dependencies installed
-- **Phase 2**: Can create model, generate migration, run migration
-- **Phase 3**: Admin panel accessible, can CRUD content
-- **Phase 4**: Translations work, language switching works
-- **Phase 5**: Assets compile, Vite HMR works
-- **Phase 6**: Routes work, SEO data renders
-- **Phase 7**: GrapesJS editor loads, blocks save
-- **Phase 8**: Caching works, performance optimized
-- **Phase 9**: Media library works, image editing works
-- **Phase 10**: SEO analyzer works, sitemaps generate
-
-## Common Pitfalls to Avoid
-
-1. **Don't skip the foundation** - Attributes and ModelScanner are critical
-2. **Test migrations** before creating views
-3. **Handle cache properly** - Clear cache during development
-4. **Check permissions** on storage directories
-5. **Verify Vite builds** before testing frontend
-6. **Test translations** with multiple locales
-7. **Test on fresh database** regularly
-
-## When Things Go Wrong
-
-### Migration errors:
+### Testing Standards
+
+1. **One assertion per test** when possible
+2. **Clear test names** describing what is tested
+3. **Arrange-Act-Assert** pattern
+4. **No logic in tests** - tests should be simple
+5. **Test edge cases** - null values, empty arrays, invalid input
+
+### Git Standards
+
+1. **Atomic commits** - one feature per commit
+2. **Descriptive messages** - explain what and why
+3. **No merge commits** on main branch
+4. **Sign commits** with GPG if possible
+
+## 🚨 Critical Implementation Order
+
+These components **MUST** be implemented in this exact order:
+
+1. ✅ **Attributes** (ContentModel, Field, Relationship, SEO) - Phase 1.1
+2. ✅ **ModelScanner** (reads attributes) - Phase 1.2
+3. ✅ **MigrationGenerator** (uses ModelScanner output) - Phase 1.3
+4. 🔄 **Base traits** (HasTranslations, HasSlug, HasSEO, OptimizedQueries) - Phase 1.4
+5. 📋 **BaseContent model** (uses traits) - Phase 1.4
+6. 📋 **Configuration files** (cms.php, languages.php) - Phase 1.5
+7. 📋 **Artisan commands** (make-model, generate-migrations, cache) - Phase 1.6
+8. 📋 **Example models** (Page, Post) - Phase 2
+9. 📋 **Translation system** (database, service, middleware) - Phase 3
+10. 📋 **Repository pattern** (ContentRepository, etc.) - Phase 4
+11. 📋 **Services** (Content, Media, SEO, Cache) - Phase 5
+12. 📋 **FormBuilder** (uses ModelScanner) - Phase 6
+13. 📋 **Admin Controllers** (uses FormBuilder) - Phase 7
+14. 📋 **Admin views** (uses FormBuilder output) - Phase 7
+15. 📋 **Frontend system** (displays content) - Phase 8
+
+**Dependencies:**
+- Phase 1.4 requires 1.1, 1.2, 1.3
+- Phase 2 requires 1.4
+- Phase 3 requires 1.4, 2
+- Phase 4 requires 3
+- Phase 5 requires 4
+- Phase 6 requires 1.2
+- Phase 7 requires 5, 6
+- Phase 8 requires 7
+
+## 🛠️ Development Commands
+
+### Testing Commands
 ```bash
-php artisan migrate:rollback
-php artisan cms:generate-migrations --fresh
-php artisan migrate
+# Run all tests
+docker exec elkcms_app php artisan test
+
+# Run specific test file
+docker exec elkcms_app php artisan test tests/Unit/CMS/Attributes/FieldAttributeTest.php
+
+# Run with coverage
+docker exec elkcms_app php artisan test --coverage
+
+# Run specific test method
+docker exec elkcms_app php artisan test --filter=test_can_create_field_attribute
+
+# Run tests in parallel (faster)
+docker exec elkcms_app php artisan test --parallel
 ```
 
-### Cache issues:
+### Code Quality Commands
 ```bash
-php artisan cache:clear
-php artisan config:clear
-php artisan view:clear
-php artisan route:clear
+# Format code with Laravel Pint
+docker exec elkcms_app ./vendor/bin/pint
+
+# Check code style without fixing
+docker exec elkcms_app ./vendor/bin/pint --test
+
+# Run static analysis with Larastan
+docker exec elkcms_app ./vendor/bin/phpstan analyse
+
+# Run ESLint on JavaScript
+docker exec elkcms_node npm run lint
 ```
 
-### Asset issues:
+### Cache Commands
 ```bash
-rm -rf public/build
-npm run build
+# Clear all caches
+docker exec elkcms_app php artisan cache:clear
+docker exec elkcms_app php artisan config:clear
+docker exec elkcms_app php artisan view:clear
+docker exec elkcms_app php artisan route:clear
+
+# Clear compiled files
+docker exec elkcms_app php artisan clear-compiled
+
+# Optimize for production
+docker exec elkcms_app php artisan optimize
 ```
 
-### Database issues:
+### Migration Commands
 ```bash
-php artisan migrate:fresh --seed
+# Run migrations
+docker exec elkcms_app php artisan migrate
+
+# Rollback last migration
+docker exec elkcms_app php artisan migrate:rollback
+
+# Fresh database (WARNING: destroys all data)
+docker exec elkcms_app php artisan migrate:fresh
+
+# Fresh database with seeders
+docker exec elkcms_app php artisan migrate:fresh --seed
 ```
 
-## Performance Monitoring
+## ⚠️ Common Pitfalls to Avoid
 
-During development, monitor:
-- Database query count (should use eager loading)
-- Cache hit rates
-- Asset bundle sizes
-- Page load times
+### 1. Skipping Documentation Updates
+**Problem:** Code is committed without updating CHANGELOG.md, DEVELOPMENT_PLAN.md, README.md
+**Solution:** Always update documentation as part of the same commit
+**Enforcement:** Create a pre-commit hook that checks for documentation updates
 
-Use Laravel Debugbar for monitoring:
+### 2. Incomplete Test Coverage
+**Problem:** Features committed without tests
+**Solution:** Write tests BEFORE or WITH the feature implementation
+**Rule:** No commit without corresponding tests
+
+### 3. Breaking Changes Without Warning
+**Problem:** Modifying existing APIs without considering impact
+**Solution:** Always check for existing usage before changing public APIs
+**Rule:** Backward compatibility is important
+
+### 4. Ignoring Test Failures
+**Problem:** Committing code that doesn't pass tests
+**Solution:** Fix all test failures before committing
+**Rule:** Test suite must be green before any commit
+
+### 5. Vague Commit Messages
+**Problem:** Commit messages like "fix bug" or "update code"
+**Solution:** Use the detailed commit message format
+**Rule:** Commit message should explain WHAT changed and WHY
+
+### 6. Large Uncommitted Changes
+**Problem:** Working on multiple features before committing
+**Solution:** Commit after each completed phase/feature
+**Rule:** Keep commits atomic and focused
+
+### 7. Not Following Implementation Order
+**Problem:** Implementing features out of order, breaking dependencies
+**Solution:** Strictly follow the order in DEVELOPMENT_PLAN.md
+**Rule:** Never skip ahead - complete phases sequentially
+
+## 🔄 When Things Go Wrong
+
+### Test Failures
 ```bash
-composer require barryvdh/laravel-debugbar --dev
+# Run tests with verbose output
+docker exec elkcms_app php artisan test --verbose
+
+# Run specific failing test
+docker exec elkcms_app php artisan test --filter=test_name
+
+# Check for syntax errors
+docker exec elkcms_app php artisan code:check
 ```
 
-## Completion Checklist
+### Migration Issues
+```bash
+# Check migration status
+docker exec elkcms_app php artisan migrate:status
 
-Before considering a phase complete:
+# Rollback last batch
+docker exec elkcms_app php artisan migrate:rollback
 
-- [ ] All files created
-- [ ] No syntax errors
-- [ ] All imports resolved
-- [ ] Migrations run successfully
-- [ ] Manual testing passes
-- [ ] Cache cleared
-- [ ] Git committed
+# Rollback specific migration
+docker exec elkcms_app php artisan migrate:rollback --step=1
+
+# Reset and re-run all migrations
+docker exec elkcms_app php artisan migrate:refresh
+```
+
+### Cache Issues
+```bash
+# Nuclear option - clear everything
+docker exec elkcms_app php artisan cache:clear
+docker exec elkcms_app php artisan config:clear
+docker exec elkcms_app php artisan view:clear
+docker exec elkcms_app php artisan route:clear
+docker exec elkcms_app composer dump-autoload
+```
+
+### Docker Issues
+```bash
+# Rebuild containers
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+
+# Check logs
+docker-compose logs app
+docker-compose logs db
+```
+
+## ✅ Phase Completion Checklist
+
+Before marking a phase as complete:
+
+- [ ] All files created according to specification
+- [ ] All tests written and passing
+- [ ] Test coverage meets requirements (80-100%)
+- [ ] Full test suite passing
+- [ ] Code formatted with Pint
+- [ ] No PHPStan errors
+- [ ] CHANGELOG.md updated
+- [ ] DEVELOPMENT_PLAN.md updated
+- [ ] README.md updated
+- [ ] Git commit created with proper message
+- [ ] No uncommitted changes remaining
+- [ ] Todo list cleared
+
+## 📚 Reference Documents
+
+When implementing features, always reference:
+
+1. **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Complete implementation specifications
+2. **[README.md](README.md)** - Feature overview and architecture
+3. **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development environment setup
+4. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+5. **[CHANGELOG.md](CHANGELOG.md)** - Change history
+6. **This file (AGENTS.md)** - Agent workflow and requirements
+
+## 🎓 Agent Learning Path
+
+For new agents implementing ELKCMS:
+
+### Week 1: Foundation Understanding
+1. Read all documentation files
+2. Understand the attribute-driven architecture
+3. Study completed phases (1.1-1.3)
+4. Review test examples
+5. Understand the development workflow
+
+### Week 2: First Implementation
+1. Complete Phase 1.4 following this guide
+2. Write comprehensive tests
+3. Update all documentation
+4. Commit with proper format
+5. Verify everything works
+
+### Week 3: Independent Implementation
+1. Complete Phase 1.5 independently
+2. Complete Phase 1.6 independently
+3. Follow workflow without guidance
+4. Maintain documentation discipline
+
+### Week 4: Advanced Features
+1. Complete Sprint 1 (Phases 2.1-2.2)
+2. Begin Sprint 2 (Translation system)
+3. Implement complex features
+4. Maintain quality standards
+
+## 🚀 Success Criteria
+
+An agent is successfully implementing ELKCMS when:
+
+1. ✅ All tests pass after every commit
+2. ✅ Documentation is always up-to-date
+3. ✅ Commits follow the standard format
+4. ✅ Code meets quality standards
+5. ✅ Phases completed in correct order
+6. ✅ Dependencies properly managed
+7. ✅ No breaking changes introduced
+8. ✅ Features work as specified
+
+## 💡 Pro Tips
+
+1. **Read the plan thoroughly** before starting any phase
+2. **Copy code examples exactly** from DEVELOPMENT_PLAN.md
+3. **Test frequently** - after every method, after every class
+4. **Commit early, commit often** - don't batch changes
+5. **Documentation is not optional** - it's mandatory
+6. **When in doubt, ask** - don't guess implementation details
+7. **Follow naming conventions** - consistency is key
+8. **Keep it simple** - don't over-engineer
+9. **Trust the plan** - it's been thoroughly designed
+10. **Quality over speed** - better to be slow and correct
 
 ---
 
-## Support for AI Agents
+## 📞 Support
 
-This document should be used alongside:
-- Main implementation plan (in .claude/plans/)
-- README.md (for feature overview)
-- DEVELOPMENT.md (for development guidelines)
+If you encounter issues or ambiguities:
 
-When implementing, always:
-1. Read the context from all documents
-2. Follow the sequential order
-3. Test incrementally
-4. Ask for clarification if the plan is ambiguous
-5. Document any changes or improvements
+1. Check DEVELOPMENT_PLAN.md for detailed specifications
+2. Review completed phases for examples
+3. Check test files for usage examples
+4. Ask for clarification if requirements are unclear
+5. Document any deviations or improvements
 
-Good luck! 🚀
+Remember: **This is a marathon, not a sprint. Quality and consistency matter more than speed.**
+
+Good luck! 🦌
+
+---
+
+**Last Updated:** 2026-01-02
+**Current Workflow Version:** 1.0
+**Compliance Required:** 100%
