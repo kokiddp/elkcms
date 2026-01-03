@@ -666,28 +666,17 @@ class FormBuilder
             $required ? ' <span class="text-danger">*</span>' : ''
         );
 
-        // GrapesJS editor container
-        $grapesjsId = 'gjs-' . Str::slug($name);
-        $html .= sprintf('<div id="%s" style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden; min-height: 500px;"></div>', $grapesjsId);
+        if ($helpText) {
+            $html .= sprintf('<div class="form-text mb-2">%s</div>', $helpText);
+        }
 
-        // Hidden textarea to store HTML
+        // Hidden textarea - GrapesJS editor will be injected before this by JavaScript
         $html .= sprintf(
             '<textarea id="%s" name="%s" data-field-type="pagebuilder" class="d-none" %s>%s</textarea>',
             $id,
             $name,
             $required,
             htmlspecialchars($value ?? '', ENT_QUOTES)
-        );
-
-        if ($helpText) {
-            $html .= sprintf('<div class="form-text">%s</div>', $helpText);
-        }
-
-        // Note: GrapesJS initialization would be done via JavaScript
-        $html .= sprintf(
-            '<script>/* Initialize GrapesJS for #%s, sync with #%s */</script>',
-            $grapesjsId,
-            $id
         );
 
         $html .= '</div>';
