@@ -1,8 +1,8 @@
 /**
  * GrapesJS Page Builder Initialization
- * 
- * This module initializes the GrapesJS visual page builder for all textareas
- * with data-field-type="pagebuilder" attribute.
+ *
+ * Professional Bootstrap 5 page builder with configurable components
+ * and uniform controls for spacing, colors, backgrounds, and responsive properties.
  */
 
 import grapesjs from 'grapesjs';
@@ -12,39 +12,38 @@ import presetWebpage from 'grapesjs-preset-webpage';
 export function initGrapesJS() {
     const pagebuilderFields = document.querySelectorAll('textarea[data-field-type="pagebuilder"]');
     console.log("[GrapesJS] Initializing for", pagebuilderFields.length, "fields");
-    
+
     pagebuilderFields.forEach((textarea) => {
         console.log("[GrapesJS] Found field:", textarea.id);
         const editorId = textarea.id + '-editor';
         const initialContent = textarea.value || '';
-        
+
         // Create wrapper div for better styling
         const wrapper = document.createElement('div');
         wrapper.className = 'grapesjs-editor-wrapper';
-        
+
         // Create editor container
         const editorContainer = document.createElement('div');
         editorContainer.id = editorId;
         editorContainer.className = 'grapesjs-editor';
-        
+
         // Append editor to wrapper
         wrapper.appendChild(editorContainer);
-        
+
         // Insert wrapper before textarea
         textarea.parentNode.insertBefore(wrapper, textarea);
-        
+
         // Hide the textarea (we'll sync content to it)
         textarea.style.display = 'none';
-        
+
         // Initialize GrapesJS
         const editor = grapesjs.init({
             container: `#${editorId}`,
             height: '600px',
             width: 'auto',
-            storageManager: false, // We'll handle storage via Laravel form submission
+            storageManager: false,
             components: initialContent,
             canvas: {
-                // Load Bootstrap 5 in the canvas iframe for accurate preview
                 styles: ['https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css'],
                 scripts: ['https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js']
             },
@@ -57,11 +56,11 @@ export function initGrapesJS() {
                 ],
             },
         });
-        
-        // Add custom Bootstrap 5 blocks
-        addBootstrap5Blocks(editor);
-        
-        // Sync content to textarea on change (clean HTML only)
+
+        // Add custom Bootstrap 5 components and types
+        addBootstrap5Components(editor);
+
+        // Sync content to textarea on change
         editor.on('update', () => {
             const html = editor.getHtml();
             const css = editor.getCss();
@@ -71,483 +70,1003 @@ export function initGrapesJS() {
             }
             textarea.value = content;
         });
-        
+
         console.log("[GrapesJS] Initialized editor:", editorId);
     });
 }
 
 /**
- * Add custom Bootstrap 5 blocks to the editor
+ * ============================================================================
+ * UTILITY FUNCTIONS - Uniform controls across all blocks
+ * ============================================================================
  */
-function addBootstrap5Blocks(editor) {
+
+/**
+ * Get spacing traits (margin, padding) for Bootstrap 5
+ */
+function getSpacingTraits() {
+    const spacingValues = [
+        { value: '', name: 'Default' },
+        { value: '0', name: '0' },
+        { value: '1', name: '1 (0.25rem)' },
+        { value: '2', name: '2 (0.5rem)' },
+        { value: '3', name: '3 (1rem)' },
+        { value: '4', name: '4 (1.5rem)' },
+        { value: '5', name: '5 (3rem)' },
+        { value: 'auto', name: 'Auto' },
+    ];
+
+    const directions = [
+        { key: 't', label: 'Top' },
+        { key: 'b', label: 'Bottom' },
+        { key: 's', label: 'Start (Left)' },
+        { key: 'e', label: 'End (Right)' },
+        { key: 'x', label: 'Horizontal (X)' },
+        { key: 'y', label: 'Vertical (Y)' },
+    ];
+
+    const traits = [];
+
+    // Margin controls
+    directions.forEach(dir => {
+        traits.push({
+            type: 'select',
+            label: `Margin ${dir.label}`,
+            name: `margin-${dir.key}`,
+            options: spacingValues,
+            changeProp: 1,
+        });
+    });
+
+    // Padding controls
+    directions.forEach(dir => {
+        traits.push({
+            type: 'select',
+            label: `Padding ${dir.label}`,
+            name: `padding-${dir.key}`,
+            options: spacingValues,
+            changeProp: 1,
+        });
+    });
+
+    return traits;
+}
+
+/**
+ * Get background traits (color, image)
+ */
+function getBackgroundTraits() {
+    const bgColors = [
+        { value: '', name: 'None' },
+        { value: 'bg-primary', name: 'Primary' },
+        { value: 'bg-secondary', name: 'Secondary' },
+        { value: 'bg-success', name: 'Success' },
+        { value: 'bg-danger', name: 'Danger' },
+        { value: 'bg-warning', name: 'Warning' },
+        { value: 'bg-info', name: 'Info' },
+        { value: 'bg-light', name: 'Light' },
+        { value: 'bg-dark', name: 'Dark' },
+        { value: 'bg-white', name: 'White' },
+        { value: 'bg-transparent', name: 'Transparent' },
+    ];
+
+    return [
+        {
+            type: 'select',
+            label: 'Background Color',
+            name: 'bg-color',
+            options: bgColors,
+            changeProp: 1,
+        },
+        {
+            type: 'text',
+            label: 'Background Image URL',
+            name: 'bg-image',
+            placeholder: 'https://example.com/image.jpg',
+            changeProp: 1,
+        },
+    ];
+}
+
+/**
+ * Get responsive width traits for containers
+ */
+function getResponsiveWidthTraits() {
+    const breakpoints = ['', 'sm', 'md', 'lg', 'xl', 'xxl'];
+    const widthOptions = [];
+
+    for (let i = 0; i <= 12; i++) {
+        widthOptions.push({ value: i.toString(), name: i.toString() });
+    }
+
+    return breakpoints.map(bp => ({
+        type: 'select',
+        label: bp ? `Width ${bp.toUpperCase()}` : 'Width (XS)',
+        name: bp ? `col-${bp}` : 'col',
+        options: [{ value: '', name: 'Auto' }, ...widthOptions],
+        changeProp: 1,
+    }));
+}
+
+/**
+ * Apply spacing classes based on traits
+ */
+function applySpacingClasses(model) {
+    const directions = ['t', 'b', 's', 'e', 'x', 'y'];
+    const types = ['margin', 'padding'];
+    const classes = [];
+
+    types.forEach(type => {
+        directions.forEach(dir => {
+            const value = model.get(`${type}-${dir}`);
+            if (value !== '' && value !== undefined) {
+                const prefix = type === 'margin' ? 'm' : 'p';
+                classes.push(`${prefix}${dir}-${value}`);
+            }
+        });
+    });
+
+    return classes;
+}
+
+/**
+ * Apply background classes and styles
+ */
+function applyBackgroundStyles(model, component) {
+    const classes = [];
+    const bgColor = model.get('bg-color');
+    const bgImage = model.get('bg-image');
+
+    if (bgColor) {
+        classes.push(bgColor);
+    }
+
+    if (bgImage) {
+        component.setStyle({
+            'background-image': `url(${bgImage})`,
+            'background-size': 'cover',
+            'background-position': 'center'
+        });
+    }
+
+    return classes;
+}
+
+/**
+ * ============================================================================
+ * COMPONENT DEFINITIONS
+ * ============================================================================
+ */
+
+function addBootstrap5Components(editor) {
+    const domComponents = editor.DomComponents;
     const blockManager = editor.BlockManager;
-    
-    // Hero Section
-    blockManager.add('hero-section', {
-        label: 'Hero Section',
-        category: 'Bootstrap 5',
-        content: `
-            <section class="hero-section py-5 text-center bg-light">
-                <div class="container">
-                    <h1 class="display-4 fw-bold">Welcome to Our Site</h1>
-                    <p class="lead">This is a hero section built with Bootstrap 5</p>
-                    <a href="#" class="btn btn-primary btn-lg">Get Started</a>
-                </div>
-            </section>
-        `,
+
+    /**
+     * PARAGRAPH COMPONENT
+     * Configurable paragraph with color, weight, size, alignment
+     */
+    domComponents.addType('bs-paragraph', {
+        model: {
+            defaults: {
+                tagName: 'p',
+                draggable: true,
+                droppable: false,
+                traits: [
+                    {
+                        type: 'text',
+                        label: 'Content',
+                        name: 'content',
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Text Color',
+                        name: 'text-color',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'text-primary', name: 'Primary' },
+                            { value: 'text-secondary', name: 'Secondary' },
+                            { value: 'text-success', name: 'Success' },
+                            { value: 'text-danger', name: 'Danger' },
+                            { value: 'text-warning', name: 'Warning' },
+                            { value: 'text-info', name: 'Info' },
+                            { value: 'text-light', name: 'Light' },
+                            { value: 'text-dark', name: 'Dark' },
+                            { value: 'text-muted', name: 'Muted' },
+                            { value: 'text-white', name: 'White' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Font Weight',
+                        name: 'font-weight',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'fw-light', name: 'Light' },
+                            { value: 'fw-normal', name: 'Normal' },
+                            { value: 'fw-bold', name: 'Bold' },
+                            { value: 'fw-bolder', name: 'Bolder' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Font Size',
+                        name: 'font-size',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'fs-1', name: 'XL' },
+                            { value: 'fs-2', name: 'Large' },
+                            { value: 'fs-3', name: 'Medium-Large' },
+                            { value: 'fs-4', name: 'Medium' },
+                            { value: 'fs-5', name: 'Small-Medium' },
+                            { value: 'fs-6', name: 'Small' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Text Alignment',
+                        name: 'text-align',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'text-start', name: 'Start' },
+                            { value: 'text-center', name: 'Center' },
+                            { value: 'text-end', name: 'End' },
+                        ],
+                        changeProp: 1,
+                    },
+                    ...getSpacingTraits(),
+                    ...getBackgroundTraits(),
+                ],
+            },
+            init() {
+                this.on('change:content change:text-color change:font-weight change:font-size change:text-align change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y change:bg-color change:bg-image', this.updateClasses);
+                this.updateClasses();
+            },
+            updateClasses() {
+                const classes = [];
+                const content = this.get('content');
+                const textColor = this.get('text-color');
+                const fontWeight = this.get('font-weight');
+                const fontSize = this.get('font-size');
+                const textAlign = this.get('text-align');
+
+                if (textColor) classes.push(textColor);
+                if (fontWeight) classes.push(fontWeight);
+                if (fontSize) classes.push(fontSize);
+                if (textAlign) classes.push(textAlign);
+
+                classes.push(...applySpacingClasses(this));
+                classes.push(...applyBackgroundStyles(this, this.view.$el));
+
+                this.setClass(classes.filter(Boolean));
+
+                if (content) {
+                    this.components(content);
+                }
+            },
+        },
     });
-    
-    // Feature Cards
-    blockManager.add('feature-cards', {
-        label: 'Feature Cards',
+
+    blockManager.add('bs-paragraph', {
+        label: 'Paragraph',
         category: 'Bootstrap 5',
-        content: `
-            <div class="container py-5">
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Feature 1</h5>
-                                <p class="card-text">Description of feature 1</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Feature 2</h5>
-                                <p class="card-text">Description of feature 2</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Feature 3</h5>
-                                <p class="card-text">Description of feature 3</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `,
+        content: { type: 'bs-paragraph', content: 'This is a paragraph. Click to edit.' },
     });
-    
-    // Call to Action
-    blockManager.add('cta-section', {
-        label: 'Call to Action',
+
+    /**
+     * HEADING COMPONENT
+     * Configurable heading with color, type (h1-h6), weight, size, alignment
+     */
+    domComponents.addType('bs-heading', {
+        model: {
+            defaults: {
+                tagName: 'h2',
+                draggable: true,
+                droppable: false,
+                traits: [
+                    {
+                        type: 'text',
+                        label: 'Content',
+                        name: 'content',
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Heading Type',
+                        name: 'heading-type',
+                        options: [
+                            { value: 'h1', name: 'H1' },
+                            { value: 'h2', name: 'H2' },
+                            { value: 'h3', name: 'H3' },
+                            { value: 'h4', name: 'H4' },
+                            { value: 'h5', name: 'H5' },
+                            { value: 'h6', name: 'H6' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Text Color',
+                        name: 'text-color',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'text-primary', name: 'Primary' },
+                            { value: 'text-secondary', name: 'Secondary' },
+                            { value: 'text-success', name: 'Success' },
+                            { value: 'text-danger', name: 'Danger' },
+                            { value: 'text-warning', name: 'Warning' },
+                            { value: 'text-info', name: 'Info' },
+                            { value: 'text-light', name: 'Light' },
+                            { value: 'text-dark', name: 'Dark' },
+                            { value: 'text-white', name: 'White' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Font Weight',
+                        name: 'font-weight',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'fw-light', name: 'Light' },
+                            { value: 'fw-normal', name: 'Normal' },
+                            { value: 'fw-bold', name: 'Bold' },
+                            { value: 'fw-bolder', name: 'Bolder' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Display Size',
+                        name: 'display-size',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'display-1', name: 'Display 1' },
+                            { value: 'display-2', name: 'Display 2' },
+                            { value: 'display-3', name: 'Display 3' },
+                            { value: 'display-4', name: 'Display 4' },
+                            { value: 'display-5', name: 'Display 5' },
+                            { value: 'display-6', name: 'Display 6' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Text Alignment',
+                        name: 'text-align',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'text-start', name: 'Start' },
+                            { value: 'text-center', name: 'Center' },
+                            { value: 'text-end', name: 'End' },
+                        ],
+                        changeProp: 1,
+                    },
+                    ...getSpacingTraits(),
+                    ...getBackgroundTraits(),
+                ],
+            },
+            init() {
+                this.on('change:content change:heading-type change:text-color change:font-weight change:display-size change:text-align change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y change:bg-color change:bg-image', this.updateComponent);
+                this.updateComponent();
+            },
+            updateComponent() {
+                const classes = [];
+                const content = this.get('content');
+                const headingType = this.get('heading-type') || 'h2';
+                const textColor = this.get('text-color');
+                const fontWeight = this.get('font-weight');
+                const displaySize = this.get('display-size');
+                const textAlign = this.get('text-align');
+
+                this.set('tagName', headingType);
+
+                if (textColor) classes.push(textColor);
+                if (fontWeight) classes.push(fontWeight);
+                if (displaySize) classes.push(displaySize);
+                if (textAlign) classes.push(textAlign);
+
+                classes.push(...applySpacingClasses(this));
+                classes.push(...applyBackgroundStyles(this, this.view.$el));
+
+                this.setClass(classes.filter(Boolean));
+
+                if (content) {
+                    this.components(content);
+                }
+            },
+        },
+    });
+
+    blockManager.add('bs-heading', {
+        label: 'Heading',
         category: 'Bootstrap 5',
-        content: `
-            <section class="py-5 bg-primary text-white text-center">
-                <div class="container">
-                    <h2 class="mb-3">Ready to get started?</h2>
-                    <p class="lead mb-4">Join us today and experience the difference</p>
-                    <a href="#" class="btn btn-light btn-lg">Sign Up Now</a>
-                </div>
-            </section>
-        `,
+        content: { type: 'bs-heading', content: 'Heading Text', 'heading-type': 'h2' },
     });
-    
-    // Pricing Table
-    blockManager.add('pricing-table', {
-        label: 'Pricing Table',
-        category: 'Bootstrap 5',
-        content: `
-            <div class="container py-5">
-                <h2 class="text-center mb-5">Pricing Plans</h2>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-header">
-                                <h4>Basic</h4>
-                            </div>
-                            <div class="card-body">
-                                <h2 class="card-title">$9<small class="text-muted">/mo</small></h2>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>Feature 1</li>
-                                    <li>Feature 2</li>
-                                </ul>
-                                <a href="#" class="btn btn-outline-primary">Choose Plan</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center border-primary">
-                            <div class="card-header bg-primary text-white">
-                                <h4>Pro</h4>
-                            </div>
-                            <div class="card-body">
-                                <h2 class="card-title">$29<small class="text-muted">/mo</small></h2>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>All Basic features</li>
-                                    <li>Feature 3</li>
-                                    <li>Feature 4</li>
-                                </ul>
-                                <a href="#" class="btn btn-primary">Choose Plan</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-header">
-                                <h4>Enterprise</h4>
-                            </div>
-                            <div class="card-body">
-                                <h2 class="card-title">$99<small class="text-muted">/mo</small></h2>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>All Pro features</li>
-                                    <li>Feature 5</li>
-                                    <li>Priority Support</li>
-                                </ul>
-                                <a href="#" class="btn btn-outline-primary">Contact Us</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `,
+
+    /**
+     * CONTAINER COMPONENT
+     * Bootstrap container with normal/fluid control
+     */
+    domComponents.addType('bs-container', {
+        model: {
+            defaults: {
+                tagName: 'div',
+                draggable: true,
+                droppable: true,
+                traits: [
+                    {
+                        type: 'select',
+                        label: 'Container Type',
+                        name: 'container-type',
+                        options: [
+                            { value: 'container', name: 'Normal' },
+                            { value: 'container-fluid', name: 'Fluid' },
+                            { value: 'container-sm', name: 'Small' },
+                            { value: 'container-md', name: 'Medium' },
+                            { value: 'container-lg', name: 'Large' },
+                            { value: 'container-xl', name: 'Extra Large' },
+                            { value: 'container-xxl', name: 'XXL' },
+                        ],
+                        changeProp: 1,
+                    },
+                    ...getSpacingTraits(),
+                    ...getBackgroundTraits(),
+                ],
+            },
+            init() {
+                this.on('change:container-type change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y change:bg-color change:bg-image', this.updateClasses);
+                this.updateClasses();
+            },
+            updateClasses() {
+                const classes = [];
+                const containerType = this.get('container-type') || 'container';
+
+                classes.push(containerType);
+                classes.push(...applySpacingClasses(this));
+                classes.push(...applyBackgroundStyles(this, this.view.$el));
+
+                this.setClass(classes.filter(Boolean));
+            },
+        },
     });
-    
-    // Container
+
     blockManager.add('bs-container', {
         label: 'Container',
-        category: 'Bootstrap 5 Layout',
-        content: '<div class="container"></div>',
+        category: 'Bootstrap 5',
+        content: { type: 'bs-container', 'container-type': 'container' },
     });
-    
-    // Row
+
+    /**
+     * ROW COMPONENT
+     * Bootstrap row that can contain columns with responsive width controls
+     */
+    domComponents.addType('bs-row', {
+        model: {
+            defaults: {
+                tagName: 'div',
+                draggable: true,
+                droppable: ['bs-column'],
+                traits: [
+                    {
+                        type: 'select',
+                        label: 'Row Gap',
+                        name: 'row-gap',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'g-0', name: '0' },
+                            { value: 'g-1', name: '1' },
+                            { value: 'g-2', name: '2' },
+                            { value: 'g-3', name: '3' },
+                            { value: 'g-4', name: '4' },
+                            { value: 'g-5', name: '5' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Horizontal Alignment',
+                        name: 'justify-content',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'justify-content-start', name: 'Start' },
+                            { value: 'justify-content-center', name: 'Center' },
+                            { value: 'justify-content-end', name: 'End' },
+                            { value: 'justify-content-around', name: 'Space Around' },
+                            { value: 'justify-content-between', name: 'Space Between' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Vertical Alignment',
+                        name: 'align-items',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'align-items-start', name: 'Start' },
+                            { value: 'align-items-center', name: 'Center' },
+                            { value: 'align-items-end', name: 'End' },
+                        ],
+                        changeProp: 1,
+                    },
+                    ...getSpacingTraits(),
+                    ...getBackgroundTraits(),
+                ],
+            },
+            init() {
+                this.on('change:row-gap change:justify-content change:align-items change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y change:bg-color change:bg-image', this.updateClasses);
+                this.updateClasses();
+            },
+            updateClasses() {
+                const classes = ['row'];
+                const rowGap = this.get('row-gap');
+                const justifyContent = this.get('justify-content');
+                const alignItems = this.get('align-items');
+
+                if (rowGap) classes.push(rowGap);
+                if (justifyContent) classes.push(justifyContent);
+                if (alignItems) classes.push(alignItems);
+
+                classes.push(...applySpacingClasses(this));
+                classes.push(...applyBackgroundStyles(this, this.view.$el));
+
+                this.setClass(classes.filter(Boolean));
+            },
+        },
+    });
+
     blockManager.add('bs-row', {
         label: 'Row',
-        category: 'Bootstrap 5 Layout',
-        content: '<div class="row"></div>',
+        category: 'Bootstrap 5',
+        content: {
+            type: 'bs-row',
+            components: [
+                { type: 'bs-column', col: '6' },
+                { type: 'bs-column', col: '6' },
+            ]
+        },
     });
-    
-    // Column
-    blockManager.add('bs-col', {
+
+    /**
+     * COLUMN COMPONENT
+     * Bootstrap column with responsive width controls for all breakpoints
+     */
+    domComponents.addType('bs-column', {
+        model: {
+            defaults: {
+                tagName: 'div',
+                draggable: ['bs-row'],
+                droppable: true,
+                traits: [
+                    ...getResponsiveWidthTraits(),
+                    ...getSpacingTraits(),
+                    ...getBackgroundTraits(),
+                ],
+            },
+            init() {
+                this.on('change:col change:col-sm change:col-md change:col-lg change:col-xl change:col-xxl change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y change:bg-color change:bg-image', this.updateClasses);
+                this.updateClasses();
+            },
+            updateClasses() {
+                const classes = [];
+                const breakpoints = ['', 'sm', 'md', 'lg', 'xl', 'xxl'];
+
+                breakpoints.forEach(bp => {
+                    const key = bp ? `col-${bp}` : 'col';
+                    const value = this.get(key);
+                    if (value) {
+                        classes.push(value === 'auto' ? key : `${key}-${value}`);
+                    }
+                });
+
+                // Default to col if no breakpoint specified
+                if (!classes.some(c => c.startsWith('col'))) {
+                    classes.push('col');
+                }
+
+                classes.push(...applySpacingClasses(this));
+                classes.push(...applyBackgroundStyles(this, this.view.$el));
+
+                this.setClass(classes.filter(Boolean));
+            },
+        },
+    });
+
+    blockManager.add('bs-column', {
         label: 'Column',
-        category: 'Bootstrap 5 Layout',
-        content: '<div class="col-md-6"></div>',
-    });
-    
-    // Button
-    blockManager.add('bs-button', {
-        label: 'Button',
-        category: 'Bootstrap 5 Components',
-        content: '<a href="#" class="btn btn-primary">Button</a>',
-    });
-    
-    // Alert
-    blockManager.add('bs-alert', {
-        label: 'Alert',
-        category: 'Bootstrap 5 Components',
-        content: '<div class="alert alert-info" role="alert">This is an info alert</div>',
+        category: 'Bootstrap 5',
+        content: { type: 'bs-column', col: '12' },
     });
 
-    // Badge
-    blockManager.add('bs-badge', {
-        label: 'Badge',
-        category: 'Bootstrap 5 Components',
-        content: '<span class="badge bg-primary">Badge</span>',
+    /**
+     * PICTURE COMPONENT
+     * Image with object-fit controls (contain, cover), aspect ratio, responsive
+     */
+    domComponents.addType('bs-picture', {
+        model: {
+            defaults: {
+                tagName: 'img',
+                draggable: true,
+                droppable: false,
+                resizable: true,
+                attributes: { src: 'https://via.placeholder.com/800x600' },
+                traits: [
+                    {
+                        type: 'text',
+                        label: 'Image URL',
+                        name: 'src',
+                    },
+                    {
+                        type: 'text',
+                        label: 'Alt Text',
+                        name: 'alt',
+                    },
+                    {
+                        type: 'select',
+                        label: 'Object Fit',
+                        name: 'object-fit',
+                        options: [
+                            { value: '', name: 'Default' },
+                            { value: 'object-fit-contain', name: 'Contain' },
+                            { value: 'object-fit-cover', name: 'Cover' },
+                            { value: 'object-fit-fill', name: 'Fill' },
+                            { value: 'object-fit-scale', name: 'Scale Down' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Aspect Ratio',
+                        name: 'aspect-ratio',
+                        options: [
+                            { value: '', name: 'None' },
+                            { value: 'ratio-1x1', name: '1:1' },
+                            { value: 'ratio-4x3', name: '4:3' },
+                            { value: 'ratio-16x9', name: '16:9' },
+                            { value: 'ratio-21x9', name: '21:9' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Responsive',
+                        name: 'responsive',
+                        options: [
+                            { value: '', name: 'No' },
+                            { value: 'img-fluid', name: 'Fluid' },
+                        ],
+                        changeProp: 1,
+                    },
+                    {
+                        type: 'select',
+                        label: 'Rounded',
+                        name: 'rounded',
+                        options: [
+                            { value: '', name: 'None' },
+                            { value: 'rounded', name: 'Rounded' },
+                            { value: 'rounded-circle', name: 'Circle' },
+                            { value: 'rounded-pill', name: 'Pill' },
+                        ],
+                        changeProp: 1,
+                    },
+                    ...getSpacingTraits(),
+                ],
+            },
+            init() {
+                this.on('change:object-fit change:aspect-ratio change:responsive change:rounded change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y', this.updateClasses);
+                this.updateClasses();
+            },
+            updateClasses() {
+                const classes = [];
+                const objectFit = this.get('object-fit');
+                const aspectRatio = this.get('aspect-ratio');
+                const responsive = this.get('responsive');
+                const rounded = this.get('rounded');
+
+                if (objectFit) classes.push(objectFit);
+                if (aspectRatio) classes.push(aspectRatio);
+                if (responsive) classes.push(responsive);
+                if (rounded) classes.push(rounded);
+
+                classes.push(...applySpacingClasses(this));
+
+                this.setClass(classes.filter(Boolean));
+            },
+        },
     });
 
-    // Breadcrumb
-    blockManager.add('bs-breadcrumb', {
-        label: 'Breadcrumb',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item"><a href="#">Library</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Data</li>
-                </ol>
-            </nav>
-        `,
+    blockManager.add('bs-picture', {
+        label: 'Picture',
+        category: 'Bootstrap 5',
+        content: { type: 'bs-picture' },
     });
 
-    // Card with Image
-    blockManager.add('bs-card-image', {
-        label: 'Card with Image',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <div class="card" style="width: 18rem;">
-                <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Placeholder">
-                <div class="card-body">
-                    <h5 class="card-title">Card Title</h5>
-                    <p class="card-text">Some quick example text to build on the card title.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-            </div>
-        `,
+    /**
+     * TABS COMPONENT
+     * Bootstrap tabs with ability to add/remove tabs
+     */
+    let tabCounter = 0;
+
+    domComponents.addType('bs-tabs', {
+        model: {
+            defaults: {
+                tagName: 'div',
+                draggable: true,
+                droppable: false,
+                traits: [
+                    {
+                        type: 'button',
+                        label: 'Add Tab',
+                        name: 'add-tab',
+                        text: 'Add Tab',
+                        command: 'add-tab',
+                    },
+                    ...getSpacingTraits(),
+                    ...getBackgroundTraits(),
+                ],
+                components: [
+                    {
+                        tagName: 'ul',
+                        attributes: { class: 'nav nav-tabs', role: 'tablist' },
+                        components: [
+                            {
+                                tagName: 'li',
+                                attributes: { class: 'nav-item', role: 'presentation' },
+                                components: [{
+                                    tagName: 'button',
+                                    attributes: {
+                                        class: 'nav-link active',
+                                        type: 'button',
+                                        'data-bs-toggle': 'tab',
+                                        'data-bs-target': '#tab1',
+                                    },
+                                    components: 'Tab 1',
+                                }]
+                            },
+                            {
+                                tagName: 'li',
+                                attributes: { class: 'nav-item', role: 'presentation' },
+                                components: [{
+                                    tagName: 'button',
+                                    attributes: {
+                                        class: 'nav-link',
+                                        type: 'button',
+                                        'data-bs-toggle': 'tab',
+                                        'data-bs-target': '#tab2',
+                                    },
+                                    components: 'Tab 2',
+                                }]
+                            },
+                        ]
+                    },
+                    {
+                        tagName: 'div',
+                        attributes: { class: 'tab-content' },
+                        components: [
+                            {
+                                tagName: 'div',
+                                attributes: { class: 'tab-pane fade show active', id: 'tab1', role: 'tabpanel' },
+                                components: 'Content for Tab 1',
+                            },
+                            {
+                                tagName: 'div',
+                                attributes: { class: 'tab-pane fade', id: 'tab2', role: 'tabpanel' },
+                                components: 'Content for Tab 2',
+                            },
+                        ]
+                    }
+                ],
+            },
+            init() {
+                this.on('change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y change:bg-color change:bg-image', this.updateClasses);
+                this.updateClasses();
+            },
+            updateClasses() {
+                const classes = [];
+                classes.push(...applySpacingClasses(this));
+                classes.push(...applyBackgroundStyles(this, this.view.$el));
+                this.setClass(classes.filter(Boolean));
+            },
+        },
     });
 
-    // Accordion
-    blockManager.add('bs-accordion', {
-        label: 'Accordion',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <div class="accordion" id="accordionExample">
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                            Accordion Item #1
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                            This is the first item's accordion body.
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                            Accordion Item #2
-                        </button>
-                    </h2>
-                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                            This is the second item's accordion body.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `,
+    // Command to add new tab
+    editor.Commands.add('add-tab', {
+        run(editor, sender, opts = {}) {
+            const selected = editor.getSelected();
+            if (selected && selected.get('type') === 'bs-tabs') {
+                tabCounter++;
+                const tabId = `tab${Date.now()}`;
+
+                // Add tab button
+                const navList = selected.components().at(0);
+                navList.append({
+                    tagName: 'li',
+                    attributes: { class: 'nav-item', role: 'presentation' },
+                    components: [{
+                        tagName: 'button',
+                        attributes: {
+                            class: 'nav-link',
+                            type: 'button',
+                            'data-bs-toggle': 'tab',
+                            'data-bs-target': `#${tabId}`,
+                        },
+                        components: `Tab ${tabCounter + 2}`,
+                    }]
+                });
+
+                // Add tab content
+                const tabContent = selected.components().at(1);
+                tabContent.append({
+                    tagName: 'div',
+                    attributes: { class: 'tab-pane fade', id: tabId, role: 'tabpanel' },
+                    components: `Content for Tab ${tabCounter + 2}`,
+                });
+            }
+        }
     });
 
-    // Carousel
-    blockManager.add('bs-carousel', {
-        label: 'Carousel',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="https://via.placeholder.com/800x400" class="d-block w-100" alt="Slide 1">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="https://via.placeholder.com/800x400" class="d-block w-100" alt="Slide 2">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="https://via.placeholder.com/800x400" class="d-block w-100" alt="Slide 3">
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-        `,
-    });
-
-    // List Group
-    blockManager.add('bs-list-group', {
-        label: 'List Group',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <ul class="list-group">
-                <li class="list-group-item">An item</li>
-                <li class="list-group-item">A second item</li>
-                <li class="list-group-item">A third item</li>
-                <li class="list-group-item">A fourth item</li>
-            </ul>
-        `,
-    });
-
-    // Modal Trigger Button
-    blockManager.add('bs-modal', {
-        label: 'Modal',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Launch Modal
-            </button>
-
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Modal body text goes here.
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `,
-    });
-
-    // Navbar
-    blockManager.add('bs-navbar', {
-        label: 'Navbar',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="#">Navbar</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Features</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Pricing</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        `,
-    });
-
-    // Progress Bar
-    blockManager.add('bs-progress', {
-        label: 'Progress Bar',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
-            </div>
-        `,
-    });
-
-    // Spinner
-    blockManager.add('bs-spinner', {
-        label: 'Spinner',
-        category: 'Bootstrap 5 Components',
-        content: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>',
-    });
-
-    // Table
-    blockManager.add('bs-table', {
-        label: 'Table',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                </tbody>
-            </table>
-        `,
-    });
-
-    // Tabs
     blockManager.add('bs-tabs', {
         label: 'Tabs',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button">Home</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button">Profile</button>
-                </li>
-            </ul>
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="home" role="tabpanel">Home content</div>
-                <div class="tab-pane fade" id="profile" role="tabpanel">Profile content</div>
-            </div>
-        `,
+        category: 'Bootstrap 5',
+        content: { type: 'bs-tabs' },
     });
 
-    // Toast
-    blockManager.add('bs-toast', {
-        label: 'Toast',
-        category: 'Bootstrap 5 Components',
-        content: `
-            <div class="toast show" role="alert">
-                <div class="toast-header">
-                    <strong class="me-auto">Bootstrap</strong>
-                    <small>11 mins ago</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-                </div>
-                <div class="toast-body">
-                    Hello, world! This is a toast message.
-                </div>
-            </div>
-        `,
+    /**
+     * ACCORDION COMPONENT
+     * Bootstrap accordion with customizable heading and content
+     */
+    let accordionCounter = 0;
+
+    domComponents.addType('bs-accordion', {
+        model: {
+            defaults: {
+                tagName: 'div',
+                draggable: true,
+                droppable: false,
+                attributes: { class: 'accordion' },
+                traits: [
+                    {
+                        type: 'button',
+                        label: 'Add Item',
+                        name: 'add-item',
+                        text: 'Add Accordion Item',
+                        command: 'add-accordion-item',
+                    },
+                    ...getSpacingTraits(),
+                    ...getBackgroundTraits(),
+                ],
+                components: [
+                    {
+                        tagName: 'div',
+                        attributes: { class: 'accordion-item' },
+                        components: [
+                            {
+                                tagName: 'h2',
+                                attributes: { class: 'accordion-header' },
+                                components: [{
+                                    tagName: 'button',
+                                    attributes: {
+                                        class: 'accordion-button',
+                                        type: 'button',
+                                        'data-bs-toggle': 'collapse',
+                                        'data-bs-target': '#collapse1',
+                                    },
+                                    components: 'Accordion Item #1',
+                                }]
+                            },
+                            {
+                                tagName: 'div',
+                                attributes: {
+                                    id: 'collapse1',
+                                    class: 'accordion-collapse collapse show',
+                                },
+                                components: [{
+                                    tagName: 'div',
+                                    attributes: { class: 'accordion-body' },
+                                    components: 'This is the first item\'s accordion body.',
+                                }]
+                            }
+                        ]
+                    },
+                    {
+                        tagName: 'div',
+                        attributes: { class: 'accordion-item' },
+                        components: [
+                            {
+                                tagName: 'h2',
+                                attributes: { class: 'accordion-header' },
+                                components: [{
+                                    tagName: 'button',
+                                    attributes: {
+                                        class: 'accordion-button collapsed',
+                                        type: 'button',
+                                        'data-bs-toggle': 'collapse',
+                                        'data-bs-target': '#collapse2',
+                                    },
+                                    components: 'Accordion Item #2',
+                                }]
+                            },
+                            {
+                                tagName: 'div',
+                                attributes: {
+                                    id: 'collapse2',
+                                    class: 'accordion-collapse collapse',
+                                },
+                                components: [{
+                                    tagName: 'div',
+                                    attributes: { class: 'accordion-body' },
+                                    components: 'This is the second item\'s accordion body.',
+                                }]
+                            }
+                        ]
+                    }
+                ],
+            },
+            init() {
+                this.on('change:margin-t change:margin-b change:margin-s change:margin-e change:margin-x change:margin-y change:padding-t change:padding-b change:padding-s change:padding-e change:padding-x change:padding-y change:bg-color change:bg-image', this.updateClasses);
+                this.updateClasses();
+            },
+            updateClasses() {
+                const classes = ['accordion'];
+                classes.push(...applySpacingClasses(this));
+                classes.push(...applyBackgroundStyles(this, this.view.$el));
+                this.setClass(classes.filter(Boolean));
+            },
+        },
     });
 
-    // 2-Column Layout
-    blockManager.add('bs-2col', {
-        label: '2 Columns',
-        category: 'Bootstrap 5 Layout',
-        content: `
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">Column 1</div>
-                    <div class="col-md-6">Column 2</div>
-                </div>
-            </div>
-        `,
+    // Command to add new accordion item
+    editor.Commands.add('add-accordion-item', {
+        run(editor, sender, opts = {}) {
+            const selected = editor.getSelected();
+            if (selected && selected.get('type') === 'bs-accordion') {
+                accordionCounter++;
+                const collapseId = `collapse${Date.now()}`;
+
+                selected.append({
+                    tagName: 'div',
+                    attributes: { class: 'accordion-item' },
+                    components: [
+                        {
+                            tagName: 'h2',
+                            attributes: { class: 'accordion-header' },
+                            components: [{
+                                tagName: 'button',
+                                attributes: {
+                                    class: 'accordion-button collapsed',
+                                    type: 'button',
+                                    'data-bs-toggle': 'collapse',
+                                    'data-bs-target': `#${collapseId}`,
+                                },
+                                components: `Accordion Item #${accordionCounter + 3}`,
+                            }]
+                        },
+                        {
+                            tagName: 'div',
+                            attributes: {
+                                id: collapseId,
+                                class: 'accordion-collapse collapse',
+                            },
+                            components: [{
+                                tagName: 'div',
+                                attributes: { class: 'accordion-body' },
+                                components: `This is item #${accordionCounter + 3}'s accordion body.`,
+                            }]
+                        }
+                    ]
+                });
+            }
+        }
     });
 
-    // 3-Column Layout
-    blockManager.add('bs-3col', {
-        label: '3 Columns',
-        category: 'Bootstrap 5 Layout',
-        content: `
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-4">Column 1</div>
-                    <div class="col-md-4">Column 2</div>
-                    <div class="col-md-4">Column 3</div>
-                </div>
-            </div>
-        `,
-    });
-
-    // 4-Column Layout
-    blockManager.add('bs-4col', {
-        label: '4 Columns',
-        category: 'Bootstrap 5 Layout',
-        content: `
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-3">Column 1</div>
-                    <div class="col-md-3">Column 2</div>
-                    <div class="col-md-3">Column 3</div>
-                    <div class="col-md-3">Column 4</div>
-                </div>
-            </div>
-        `,
+    blockManager.add('bs-accordion', {
+        label: 'Accordion',
+        category: 'Bootstrap 5',
+        content: { type: 'bs-accordion' },
     });
 }

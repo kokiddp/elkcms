@@ -1,4 +1,4 @@
-# GrapesJS Visual Page Builder - Implementation Summary
+# GrapesJS Visual Page Builder - Professional Implementation
 
 **Implemented:** 2026-01-03
 **Sprint:** Sprint 1, Step 2
@@ -8,409 +8,302 @@
 
 ## Overview
 
-GrapesJS visual page builder has been successfully integrated into ELKCMS with Bootstrap 5 support and clean DOM storage.
+GrapesJS visual page builder has been professionally implemented with configurable Bootstrap 5 components featuring uniform controls for spacing, colors, backgrounds, and responsive properties.
 
 ### Key Features
 
+✅ **Professional Component System** - Custom GrapesJS component types with full trait controls
+✅ **Uniform Controls** - Consistent spacing, background, and responsive controls across all blocks
+✅ **Bootstrap 5 Native** - All components use pure Bootstrap 5.3.2 classes
+✅ **Responsive Breakpoints** - Column widths configurable for xs, sm, md, lg, xl, xxl
+✅ **Spacing Controls** - Margin and padding (top, bottom, start, end, x, y) for all blocks
+✅ **Background Controls** - Color and image backgrounds for all blocks
 ✅ **Clean DOM Storage** - Saves only HTML content without wrapper divs
-✅ **Bootstrap 5 Integration** - All blocks use Bootstrap 5.3.2 classes
-✅ **30+ Bootstrap Components** - Comprehensive component library including:
-  - **Sections:** Hero, CTA, Pricing Tables
-  - **Layout:** Container, Row, 2/3/4 Column layouts
-  - **Content:** Cards, Feature Cards, Accordion, Tabs
-  - **Navigation:** Navbar, Breadcrumb
-  - **UI Elements:** Buttons, Badges, Alerts, Progress, Spinner
-  - **Media:** Carousel, Modal, Toast
-  - **Data:** Tables, List Groups
-✅ **Responsive Preview** - Desktop, Tablet, Mobile device testing
-✅ **WYSIWYG Editing** - Drag-and-drop visual editor
-✅ **Form Integration** - Seamlessly integrates with FormBuilder
-✅ **Minimal CSS Conflicts** - Only resets Bootstrap 5 conflicts, lets GrapesJS use default styling  
+✅ **WYSIWYG Editing** - Drag-and-drop visual editor with accurate preview
 
 ---
 
-## Implementation Details
+## Component Library
 
-### 1. NPM Packages Installed
+### 1. Paragraph Block
 
-```json
-{
-  "grapesjs": "^0.21.13",
-  "grapesjs-preset-webpage": "^1.0.3",
-  "grapesjs-blocks-bootstrap5": "^1.0.2"
-}
-```
+**Purpose:** Configurable text paragraph with full typography control
 
-### 2. Files Created/Modified
+**Controls:**
+- **Content** - Text content (editable)
+- **Text Color** - Default, Primary, Secondary, Success, Danger, Warning, Info, Light, Dark, Muted, White
+- **Font Weight** - Default, Light, Normal, Bold, Bolder
+- **Font Size** - Default, XL (fs-1), Large (fs-2), Medium-Large (fs-3), Medium (fs-4), Small-Medium (fs-5), Small (fs-6)
+- **Text Alignment** - Default, Start, Center, End
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+- **Background** - Color (Bootstrap colors) and Image URL
 
-**New Files:**
-- `resources/js/admin/grapesjs-init.js` (553 lines) - Main GrapesJS initialization with 30+ Bootstrap blocks
-- `resources/scss/admin/_grapesjs.scss` (32 lines) - Minimal CSS reset for Bootstrap 5 conflicts
-
-**Modified Files:**
-- `app/CMS/Builders/FormBuilder.php` - Added `data-field-type="pagebuilder"` attribute
-- `resources/js/admin/app.js` - Import and initialize GrapesJS
-- `package.json`, `package-lock.json` - Added dependencies
-- `app/CMS/ContentModels/TestPost.php` - Changed content field to pagebuilder type
-- `resources/views/admin/content/form.blade.php` - Uses FormBuilder dynamic generation
-- `resources/views/admin/content/create.blade.php` - Full-width layout for pagebuilder
-- `resources/views/admin/content/edit.blade.php` - Full-width layout for pagebuilder
-
-### 3. GrapesJS Initialization Script
-
-**File:** `resources/js/admin/grapesjs-init.js`
-
-```javascript
-import grapesjs from 'grapesjs';
-import 'grapesjs/dist/css/grapes.min.css';
-import presetWebpage from 'grapesjs-preset-webpage';
-
-export function initGrapesJS() {
-    const pagebuilderFields = document.querySelectorAll('textarea[data-field-type="pagebuilder"]');
-    
-    pagebuilderFields.forEach((textarea) => {
-        const editorId = textarea.id + '-editor';
-        const initialContent = textarea.value || '';
-        
-        // Create editor container
-        const editorContainer = document.createElement('div');
-        editorContainer.id = editorId;
-        editorContainer.className = 'grapesjs-editor';
-        
-        textarea.parentNode.insertBefore(editorContainer, textarea);
-        textarea.style.display = 'none';
-        
-        const editor = grapesjs.init({
-            container: `#${editorId}`,
-            height: '600px',
-            width: 'auto',
-            storageManager: false, // Use textarea as storage
-            components: initialContent,
-            canvas: {
-                // Bootstrap 5.3.2 loaded in canvas iframe
-                styles: ['https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css'],
-                scripts: ['https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js']
-            },
-            plugins: [presetWebpage],
-            deviceManager: {
-                devices: [
-                    { id: 'desktop', name: 'Desktop', width: '' },
-                    { id: 'tablet', name: 'Tablet', width: '768px', widthMedia: '992px' },
-                    { id: 'mobile', name: 'Mobile', width: '375px', widthMedia: '480px' },
-                ],
-            },
-        });
-        
-        addBootstrap5Blocks(editor);
-        
-        // Clean HTML storage - stores only body content
-        editor.on('update', () => {
-            const html = editor.getHtml(); // Clean HTML only
-            const css = editor.getCss();
-            let content = html; // No wrapper divs
-            if (css) {
-                content += `\n<style>${css}</style>`;
-            }
-            textarea.value = content; // Store clean DOM
-        });
-    });
-}
-```
-
-### 4. Bootstrap 5 Custom Blocks
-
-The editor includes 30+ pre-built Bootstrap 5 component blocks organized into three categories:
-
-#### Bootstrap 5 Section Blocks
-- **Hero Section** - Full-width hero with heading, lead text, and CTA button
-- **Call to Action** - Colored background section with centered CTA
-- **Pricing Table** - 3-tier pricing cards (Basic, Pro, Enterprise)
-- **Feature Cards** - 3-column grid of feature cards
-
-#### Bootstrap 5 Layout Blocks
-- **Container** - Bootstrap container wrapper
-- **Row** - Bootstrap row
-- **Column** - Single column (col-md-6)
-- **2 Columns** - Pre-built 2-column layout
-- **3 Columns** - Pre-built 3-column layout
-- **4 Columns** - Pre-built 4-column layout
-
-#### Bootstrap 5 Component Blocks
-- **Button** - Bootstrap button (btn btn-primary)
-- **Badge** - Colored badge label
-- **Alert** - Info alert box
-- **Breadcrumb** - Navigation breadcrumb
-- **Card with Image** - Bootstrap card with image, title, text, and button
-- **Accordion** - Collapsible accordion with 2 items
-- **Carousel** - Image carousel with 3 slides and controls
-- **List Group** - Vertical list of items
-- **Modal** - Modal dialog with trigger button
-- **Navbar** - Responsive navigation bar
-- **Progress Bar** - Progress bar (75%)
-- **Spinner** - Loading spinner
-- **Table** - Striped data table
-- **Tabs** - Tab navigation with content panels
-- **Toast** - Notification toast message
-
-All blocks use pure Bootstrap 5.3.2 classes with no custom CSS required.
-
-### 5. FormBuilder Integration
-
-**File:** `app/CMS/Builders/FormBuilder.php` (Line 665)
-
-```php
-protected function renderPageBuilderField(string , , array ): string
-{
-     = ->generateFieldId();
-     = e(['label'] ?? 'Page Builder');
-     = ['required'] ?? false;
-     = ['helpText'] ?? '';
-    
-    return sprintf(
-        '<div class="mb-3">
-            <label for="%s" class="form-label">%s %s</label>
-            %s
-            <textarea id="%s" name="%s" data-field-type="pagebuilder" class="d-none" %s>%s</textarea>
-        </div>',
-        ,
-        ,
-         ? '<span class="text-danger">*</span>' : '',
-         ? '<small class="form-text text-muted">' . e() . '</small>' : '',
-        ,
-        ,
-         ? 'required' : '',
-        e()
-    );
-}
-```
-
-The key addition is `data-field-type="pagebuilder"` which allows JavaScript to identify and initialize the editor.
-
-### 6. Admin App Integration
-
-**File:** `resources/js/admin/app.js`
-
-```javascript
-import 'bootstrap';
-import { initGrapesJS } from './grapesjs-init';
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Admin panel ready');
-    initGrapesJS(); // Initialize GrapesJS for pagebuilder fields
-});
-```
-
-### 7. Asset Compilation
-
-Built with Vite:
-```
-✓ built in 2.54s
-✓ 984.77 kB → public/build/assets/grapes-CfjhbfEp.js (gzipped: 264.54 kB)
-```
+**Bootstrap Classes Generated:**
+- Typography: `text-{color}`, `fw-{weight}`, `fs-{size}`, `text-{align}`
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+- Background: `bg-{color}`
 
 ---
 
-## Usage in Content Models
+### 2. Heading Block
 
-### Example: TestPost Model
+**Purpose:** Configurable heading (H1-H6) with display sizes and full control
 
-```php
-#[Field(
-    type: 'pagebuilder',
-    label: 'Post Content',
-    translatable: true
-)]
-protected string $content;
-```
+**Controls:**
+- **Content** - Heading text (editable)
+- **Heading Type** - H1, H2, H3, H4, H5, H6 (changes tag name)
+- **Text Color** - Default, Primary, Secondary, Success, Danger, Warning, Info, Light, Dark, White
+- **Font Weight** - Default, Light, Normal, Bold, Bolder
+- **Display Size** - Default, Display 1-6 (large hero headings)
+- **Text Alignment** - Default, Start, Center, End
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+- **Background** - Color and Image URL
 
-### Database Column
-
-```php
-$table->longText('content')->nullable();
-```
-
-Use `longText` to accommodate large HTML content.
+**Bootstrap Classes Generated:**
+- Typography: `text-{color}`, `fw-{weight}`, `display-{size}`, `text-{align}`
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+- Background: `bg-{color}`
 
 ---
 
-## Testing
+### 3. Container Block
 
-### Unit Tests
+**Purpose:** Bootstrap container wrapper with fluid/responsive options
 
-All FormBuilder tests passing (24/24):
+**Controls:**
+- **Container Type** - Normal, Fluid, Small, Medium, Large, Extra Large, XXL
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+- **Background** - Color and Image URL
 
-```bash
-php artisan test --filter=FormBuilderTest
-```
+**Bootstrap Classes Generated:**
+- Container: `container`, `container-fluid`, `container-{sm|md|lg|xl|xxl}`
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+- Background: `bg-{color}`
 
-Specific pagebuilder test:
-```bash
-php artisan test --filter=FormBuilderTest::it_renders_page_builder_field_correctly
-# ✓ it renders page builder field correctly (3 assertions)
-```
-
-### Manual Testing
-
-1. Navigate to: `http://localhost/elk-cms/content/test-post/create`
-2. The "Post Content" field will load GrapesJS visual editor
-3. Drag Bootstrap 5 blocks from the left panel
-4. Edit content inline
-5. Preview in Desktop/Tablet/Mobile modes
-6. Submit form - clean HTML is saved to database
+**Notes:**
+- Can contain Row blocks
+- Full width when using `container-fluid`
 
 ---
 
-## Frontend Rendering
+### 4. Row Block
 
-### Displaying Saved Content
+**Purpose:** Bootstrap row that contains columns with gap and alignment controls
 
-```blade
-@if($content->content)
-    <div class="content-body">
-        {!! $content->content !!}
-    </div>
-@endif
-```
+**Controls:**
+- **Row Gap** - Default, 0-5 (g-0 through g-5)
+- **Horizontal Alignment** - Default, Start, Center, End, Space Around, Space Between
+- **Vertical Alignment** - Default, Start, Center, End
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+- **Background** - Color and Image URL
 
-**Note:** Content is saved as clean HTML, safe to render with `{!! !!}` (unescaped output).
+**Bootstrap Classes Generated:**
+- Layout: `row`, `g-{gap}`, `justify-content-{align}`, `align-items-{align}`
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+- Background: `bg-{color}`
 
-### Ensure Bootstrap 5 is loaded
+**Notes:**
+- Only accepts Column blocks as children
+- Pre-configured with 2 columns by default
+
+---
+
+### 5. Column Block
+
+**Purpose:** Bootstrap column with responsive width controls for all breakpoints
+
+**Controls:**
+- **Width (XS)** - Auto or 1-12
+- **Width SM** - Auto or 1-12 (≥576px)
+- **Width MD** - Auto or 1-12 (≥768px)
+- **Width LG** - Auto or 1-12 (≥992px)
+- **Width XL** - Auto or 1-12 (≥1200px)
+- **Width XXL** - Auto or 1-12 (≥1400px)
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+- **Background** - Color and Image URL
+
+**Bootstrap Classes Generated:**
+- Layout: `col-{breakpoint}-{width}` (e.g., `col-md-6`, `col-lg-4`)
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+- Background: `bg-{color}`
+
+**Notes:**
+- Can only be dropped inside Row blocks
+- Responsive breakpoints allow different widths per screen size
+- Defaults to `col` if no width specified
+
+---
+
+### 6. Picture Block
+
+**Purpose:** Image with object-fit, aspect ratio, and responsive controls
+
+**Controls:**
+- **Image URL** - Source URL for the image
+- **Alt Text** - Accessibility alt attribute
+- **Object Fit** - Default, Contain, Cover, Fill, Scale Down
+- **Aspect Ratio** - None, 1:1, 4:3, 16:9, 21:9
+- **Responsive** - No, Fluid (img-fluid for responsive sizing)
+- **Rounded** - None, Rounded, Circle, Pill
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+
+**Bootstrap Classes Generated:**
+- Image: `object-fit-{contain|cover|fill|scale}`, `ratio-{ratio}`, `img-fluid`, `rounded{-circle|-pill}`
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+
+**Notes:**
+- Uses Bootstrap 5's object-fit utilities
+- Aspect ratio wrapper requires Bootstrap 5.1+
+- Resizable in editor
+
+---
+
+### 7. Tabs Block
+
+**Purpose:** Bootstrap tabs navigation with dynamic tab management
+
+**Controls:**
+- **Add Tab** - Button to add new tab dynamically
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+- **Background** - Color and Image URL
+
+**Features:**
+- Click "Add Tab" button in traits panel to dynamically add tabs
+- Each tab has editable label and content
+- Tabs are fully functional with Bootstrap's JavaScript
+- Pre-configured with 2 tabs
+
+**Bootstrap Classes Generated:**
+- Tabs: `nav nav-tabs`, `nav-item`, `nav-link`, `tab-content`, `tab-pane`
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+- Background: `bg-{color}`
+
+**Notes:**
+- Tab content is editable by clicking into the content area
+- Tab labels are editable by clicking the button text
+- Unique IDs automatically generated for each tab
+
+---
+
+### 8. Accordion Block
+
+**Purpose:** Bootstrap accordion with collapsible items and dynamic management
+
+**Controls:**
+- **Add Accordion Item** - Button to add new accordion item dynamically
+- **Spacing** - Margin & Padding (Top, Bottom, Start, End, Horizontal, Vertical)
+- **Background** - Color and Image URL
+
+**Features:**
+- Click "Add Accordion Item" button to dynamically add items
+- Each item has editable heading and content body
+- First item expanded by default
+- Fully functional collapse/expand with Bootstrap's JavaScript
+- Pre-configured with 2 items
+
+**Bootstrap Classes Generated:**
+- Accordion: `accordion`, `accordion-item`, `accordion-header`, `accordion-button`, `accordion-collapse`, `accordion-body`
+- Spacing: `m{direction}-{value}`, `p{direction}-{value}`
+- Background: `bg-{color}`
+
+**Notes:**
+- Heading and body content are both editable
+- Unique IDs automatically generated for collapse targets
+- Only one item can be expanded at a time (default Bootstrap behavior)
+
+---
+
+## Implementation Architecture
+
+### Utility Functions
+
+**Uniform control system** implemented via abstracted utility functions:
+
+1. **`getSpacingTraits()`** - Returns margin/padding controls for 6 directions (t, b, s, e, x, y) × 2 types = 12 controls
+2. **`getBackgroundTraits()`** - Returns background color (11 options) + image URL
+3. **`getResponsiveWidthTraits()`** - Returns width controls for 6 breakpoints (xs, sm, md, lg, xl, xxl)
+4. **`applySpacingClasses(model)`** - Converts trait values to Bootstrap spacing classes
+5. **`applyBackgroundStyles(model, component)`** - Applies background color classes and image styles
+
+### Component Type System
+
+All components use GrapesJS's `domComponents.addType()` API with:
+
+- **`model.defaults`** - Define tagName, draggable/droppable rules, traits array
+- **`init()`** - Set up event listeners for trait changes
+- **`updateClasses()` / `updateComponent()`** - Apply Bootstrap classes based on trait values
+
+### Block Registration
+
+Components registered via `blockManager.add()` with:
+- Label and category for UI organization
+- Default content configuration
+- Pre-configured initial values
+
+---
+
+## Technical Details
+
+### Files Modified
+
+**[resources/js/admin/grapesjs-init.js](resources/js/admin/grapesjs-init.js)** (1073 lines)
+- Utility functions for uniform controls (150 lines)
+- 8 professional component type definitions (900 lines)
+- Block manager registrations
+- Custom commands for dynamic tab/accordion items
+
+**[resources/scss/admin/_grapesjs.scss](resources/scss/admin/_grapesjs.scss)** (32 lines)
+- Minimal CSS reset for Bootstrap 5 conflicts only
+
+### Bootstrap 5 Classes Used
+
+**Spacing:**
+- Margin: `m{t|b|s|e|x|y}-{0|1|2|3|4|5|auto}`
+- Padding: `p{t|b|s|e|x|y}-{0|1|2|3|4|5}`
+- Gap: `g-{0|1|2|3|4|5}`
+
+**Typography:**
+- Text Color: `text-{primary|secondary|success|danger|warning|info|light|dark|muted|white}`
+- Font Weight: `fw-{light|normal|bold|bolder}`
+- Font Size: `fs-{1|2|3|4|5|6}`
+- Display: `display-{1|2|3|4|5|6}`
+- Alignment: `text-{start|center|end}`
+
+**Layout:**
+- Container: `container{-fluid|-sm|-md|-lg|-xl|-xxl}`
+- Grid: `row`, `col{-sm|-md|-lg|-xl|-xxl}-{1-12}`
+- Flexbox: `justify-content-{start|center|end|around|between}`, `align-items-{start|center|end}`
+
+**Components:**
+- Tabs: `nav nav-tabs`, `nav-item`, `nav-link`, `tab-content`, `tab-pane fade show active`
+- Accordion: `accordion`, `accordion-item`, `accordion-header`, `accordion-button`, `accordion-collapse collapse`, `accordion-body`
+
+**Utilities:**
+- Background: `bg-{primary|secondary|success|danger|warning|info|light|dark|white|transparent}`
+- Image: `img-fluid`, `object-fit-{contain|cover|fill|scale}`, `rounded{-circle|-pill}`
+- Aspect Ratio: `ratio ratio-{1x1|4x3|16x9|21x9}`
+
+---
+
+## Clean HTML Output
+
+GrapesJS stores only the HTML body content:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="container mt-5 bg-light px-4 py-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-12 col-md-8">
+            <h1 class="display-4 fw-bold text-primary text-center mb-4">Welcome</h1>
+            <p class="fs-5 text-center">This is a paragraph with custom styling.</p>
+        </div>
+    </div>
+</div>
 ```
 
----
-
-## Technical Requirements Met
-
-### ✅ Clean DOM Storage
-
-- Editor saves `editor.getHtml()` only (body content)
-- No wrapper `<div id="gjs">` or similar
-- Optional inline `<style>` tag for custom CSS
-- Pure HTML output, no JSON
-
-### ✅ Bootstrap 5 DOM Generation
-
-- Canvas iframe loads Bootstrap 5.3.2 from CDN
-- All custom blocks use Bootstrap 5 classes
-- No custom CSS required for blocks
-- Responsive grid system (container, row, col-*)
+No wrapper divs, no editor markup - just clean Bootstrap 5 HTML ready for production.
 
 ---
 
-## Architecture Decisions
-
-### Why storageManager: false?
-
-We disabled GrapesJS's built-in storage manager and use Laravel's form submission instead. This ensures:
-- Content is validated by Laravel
-- No AJAX save endpoints needed
-- Standard CRUD workflow
-- Easy to implement translations
-
-### Why Bootstrap 5 CDN in Canvas?
-
-Loading Bootstrap from CDN in the canvas iframe ensures:
-- Editor preview matches frontend exactly
-- No build process conflicts
-- Users see real Bootstrap rendering
-- Faster editor initialization
-
-### Why Custom Blocks Plugin?
-
-Creating custom blocks allows:
-- Pre-designed templates for users
-- Consistent Bootstrap 5 usage
-- Faster page building
-- Brand-specific components
-
----
-
-## Future Enhancements
-
-### Sprint 3 Considerations
-
-1. **Media Library Integration**
-   - Connect GrapesJS asset manager to ELKCMS media library
-   - Drag images from media library into editor
-
-2. **Template Library**
-   - Save and reuse common page layouts
-   - Import/export templates
-
-3. **Custom Components**
-   - Create reusable custom components
-   - Store in database for reuse across pages
-
-4. **Version History**
-   - Track content changes
-   - Restore previous versions
-
-5. **Collaboration**
-   - Real-time collaborative editing
-   - User activity tracking
-
----
-
-## Troubleshooting
-
-### GrapesJS Not Loading
-
-**Check:**
-1. Vite built assets: `npm run build`
-2. JavaScript console for errors
-3. Admin layout includes: `@vite(['resources/js/admin/app.js'])`
-
-**Solution:**
-```bash
-docker exec elkcms_node npm run build
-```
-
-### Bootstrap Classes Not Rendering
-
-**Check:**
-1. Bootstrap CDN in canvas config
-2. Frontend has Bootstrap CSS loaded
-
-**Solution:**
-Verify canvas config in `grapesjs-init.js`:
-```javascript
-canvas: {
-    styles: ['https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css']
-}
-```
-
-### Content Not Saving
-
-**Check:**
-1. Hidden textarea is updated on form submit
-2. Database column is `longText` not `text`
-3. Field is in `$fillable` array
-
-**Solution:**
-Check FormBuilder renders `data-field-type="pagebuilder"` attribute.
-
----
-
-## Resources
-
-- **GrapesJS Docs:** https://grapesjs.com/docs/
-- **Bootstrap 5 Docs:** https://getbootstrap.com/docs/5.3/
-- **GrapesJS Preset Webpage:** https://github.com/GrapesJS/preset-webpage
-- **Laravel Vite:** https://laravel.com/docs/vite
-
----
-
-## Commit History
-
-**Commit:** 129cbaf (2026-01-03)
-- feat: Implement GrapesJS Visual Page Builder with Bootstrap 5
-- Files: FormBuilder.php, grapesjs-init.js, app.js, package.json
-
----
-
-**Status:** ✅ Production Ready
-
-**Next Steps:** Sprint 1, Step 3 - Frontend Routes & Views (6h estimated)
+**Documentation Version:** 2.0
+**Last Updated:** 2026-01-03
+**Status:** Production Ready ✅
