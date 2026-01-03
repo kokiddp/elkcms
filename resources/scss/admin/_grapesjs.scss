@@ -22,11 +22,23 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    
-    // Main panels layout
+    min-height: 600px;
+
+    // Fix main editor container
+    .gjs-editor-cont {
+        display: flex;
+        flex-direction: column;
+        height: 600px;
+    }
+
+    // Main panels layout - Canvas area (center)
     .gjs-cv-canvas {
         background: #f5f5f5;
-        
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+
         // Canvas iframe
         .gjs-frame {
             border: 1px solid #ddd;
@@ -35,30 +47,45 @@
             background: white;
         }
     }
-    
-    // Top toolbar
+
+    // Top toolbar - ensure proper alignment
     .gjs-pn-panels {
         background: #ffffff;
         border-bottom: 1px solid #e0e0e0;
         padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
     }
-    
+
     .gjs-pn-panel {
+        display: flex;
+        align-items: center;
+
         &.gjs-pn-views {
             border-right: 1px solid #e0e0e0;
             padding-right: 12px;
             margin-right: 12px;
         }
-        
+
         &.gjs-pn-commands {
             flex-grow: 1;
+            display: flex;
+            align-items: center;
         }
-        
+
         &.gjs-pn-options {
             border-left: 1px solid #e0e0e0;
             padding-left: 12px;
             margin-left: 12px;
         }
+    }
+
+    // Fix panel buttons container alignment
+    .gjs-pn-buttons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
     
     // Buttons styling
@@ -99,11 +126,22 @@
         }
     }
     
+    // Main editor area with sidebars
+    .gjs-editor {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+    }
+
     // Left sidebar - Blocks panel
     .gjs-pn-panel.gjs-pn-views-container {
         width: 280px;
         background: #ffffff;
         border-right: 1px solid #e0e0e0;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
         
         .gjs-blocks-c {
             padding: 16px 12px;
@@ -157,12 +195,16 @@
             }
         }
     }
-    
+
     // Right sidebar - Layers/Styles panel
     .gjs-pn-panel.gjs-pn-views-container:last-child {
         width: 300px;
         background: #ffffff;
         border-left: 1px solid #e0e0e0;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
         
         // Layers panel
         .gjs-layers {
