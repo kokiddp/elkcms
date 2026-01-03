@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\CMS\Builders\FormBuilder;
 use App\CMS\Repositories\ContentRepository;
 use App\CMS\Reflection\ModelScanner;
 use App\Http\Controllers\Controller;
@@ -13,10 +14,12 @@ use Illuminate\View\View;
 class ContentController extends Controller
 {
     protected ModelScanner $scanner;
+    protected FormBuilder $formBuilder;
 
-    public function __construct(ModelScanner $scanner)
+    public function __construct(ModelScanner $scanner, FormBuilder $formBuilder)
     {
         $this->scanner = $scanner;
+        $this->formBuilder = $formBuilder;
     }
 
     public function index(string $modelType): View
@@ -24,7 +27,7 @@ class ContentController extends Controller
         $modelClass = $this->getModelClass($modelType);
         $repository = new ContentRepository($modelClass);
         $metadata = $this->scanner->scan($modelClass);
-        
+
         $contents = $repository
             ->orderBy('updated_at', 'desc')
             ->orderBy('id', 'desc')
@@ -49,18 +52,22 @@ class ContentController extends Controller
             'modelClass' => $modelClass,
             'metadata' => $metadata,
             'label' => $metadata['contentModel']['label'] ?? 'Content',
+            'formBuilder' => $this->formBuilder,
         ]);
     }
 
     public function store(Request $request, string $modelType): RedirectResponse
     {
         $modelClass = $this->getModelClass($modelType);
-        $metadata = $this->scanner->scan($modelClass);
-        
-        $validated = $request->validate($this->getValidationRules($metadata));
+
+        // Use FormBuilder for validation rules
+        $rules = $this->formBuilder->buildValidationRules($modelClass);
+        $rules['status'] = 'nullable|string|in:draft,published,archived';
+
+        $validated = $request->validate($rules);
 
         $repository = new ContentRepository($modelClass);
-        
+
         if (!isset($validated['status'])) {
             $validated['status'] = 'draft';
         }
@@ -84,7 +91,7 @@ class ContentController extends Controller
         $repository = new ContentRepository($modelClass);
 
         $content = $repository->find($id);
-        
+
         if (!$content) {
             abort(404, 'Content not found');
         }
@@ -97,15 +104,19 @@ class ContentController extends Controller
             'metadata' => $metadata,
             'label' => $metadata['contentModel']['label'] ?? 'Content',
             'content' => $content,
+            'formBuilder' => $this->formBuilder,
         ]);
     }
 
     public function update(Request $request, string $modelType, int $id): RedirectResponse
     {
         $modelClass = $this->getModelClass($modelType);
-        $metadata = $this->scanner->scan($modelClass);
-        
-        $validated = $request->validate($this->getValidationRules($metadata));
+
+        // Use FormBuilder for validation rules
+        $rules = $this->formBuilder->buildValidationRules($modelClass);
+        $rules['status'] = 'nullable|string|in:draft,published,archived';
+
+        $validated = $request->validate($rules);
 
         $repository = new ContentRepository($modelClass);
         $updated = $repository->update($id, $validated);
@@ -157,20 +168,5 @@ class ContentController extends Controller
         }
 
         return $modelClass;
-    }
-
-    protected function getValidationRules(array $metadata): array
-    {
-        $rules = [];
-        
-        foreach ($metadata['fields'] as $fieldName => $field) {
-            if (!empty($field['validation'])) {
-                $rules[$fieldName] = $field['validation'];
-            }
-        }
-
-        $rules['status'] = 'nullable|string|in:draft,published,archived';
-
-        return $rules;
     }
 }
