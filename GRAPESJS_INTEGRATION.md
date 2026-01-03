@@ -12,12 +12,20 @@ GrapesJS visual page builder has been successfully integrated into ELKCMS with B
 
 ### Key Features
 
-✅ **Clean DOM Storage** - Saves only HTML content without wrapper divs  
-✅ **Bootstrap 5 Integration** - All blocks use Bootstrap 5.3.2 classes  
-✅ **Custom Bootstrap Blocks** - Hero, Cards, CTA, Pricing, Container, Row, Column  
-✅ **Responsive Preview** - Desktop, Tablet, Mobile device testing  
-✅ **WYSIWYG Editing** - Drag-and-drop visual editor  
-✅ **Form Integration** - Seamlessly integrates with FormBuilder  
+✅ **Clean DOM Storage** - Saves only HTML content without wrapper divs
+✅ **Bootstrap 5 Integration** - All blocks use Bootstrap 5.3.2 classes
+✅ **30+ Bootstrap Components** - Comprehensive component library including:
+  - **Sections:** Hero, CTA, Pricing Tables
+  - **Layout:** Container, Row, 2/3/4 Column layouts
+  - **Content:** Cards, Feature Cards, Accordion, Tabs
+  - **Navigation:** Navbar, Breadcrumb
+  - **UI Elements:** Buttons, Badges, Alerts, Progress, Spinner
+  - **Media:** Carousel, Modal, Toast
+  - **Data:** Tables, List Groups
+✅ **Responsive Preview** - Desktop, Tablet, Mobile device testing
+✅ **WYSIWYG Editing** - Drag-and-drop visual editor
+✅ **Form Integration** - Seamlessly integrates with FormBuilder
+✅ **Minimal CSS Conflicts** - Only resets Bootstrap 5 conflicts, lets GrapesJS use default styling  
 
 ---
 
@@ -36,13 +44,17 @@ GrapesJS visual page builder has been successfully integrated into ELKCMS with B
 ### 2. Files Created/Modified
 
 **New Files:**
-- `resources/js/admin/grapesjs-init.js` (156 lines) - Main GrapesJS initialization module
+- `resources/js/admin/grapesjs-init.js` (553 lines) - Main GrapesJS initialization with 30+ Bootstrap blocks
+- `resources/scss/admin/_grapesjs.scss` (32 lines) - Minimal CSS reset for Bootstrap 5 conflicts
 
 **Modified Files:**
 - `app/CMS/Builders/FormBuilder.php` - Added `data-field-type="pagebuilder"` attribute
 - `resources/js/admin/app.js` - Import and initialize GrapesJS
 - `package.json`, `package-lock.json` - Added dependencies
 - `app/CMS/ContentModels/TestPost.php` - Changed content field to pagebuilder type
+- `resources/views/admin/content/form.blade.php` - Uses FormBuilder dynamic generation
+- `resources/views/admin/content/create.blade.php` - Full-width layout for pagebuilder
+- `resources/views/admin/content/edit.blade.php` - Full-width layout for pagebuilder
 
 ### 3. GrapesJS Initialization Script
 
@@ -107,28 +119,40 @@ export function initGrapesJS() {
 
 ### 4. Bootstrap 5 Custom Blocks
 
-All custom blocks use pure Bootstrap 5 classes:
+The editor includes 30+ pre-built Bootstrap 5 component blocks organized into three categories:
 
-**Hero Section**
-```html
-<section class="hero-section py-5 text-center bg-light">
-    <div class="container">
-        <h1 class="display-4 fw-bold">Welcome</h1>
-        <p class="lead">Hero section</p>
-        <a href="#" class="btn btn-primary btn-lg">Get Started</a>
-    </div>
-</section>
-```
+#### Bootstrap 5 Section Blocks
+- **Hero Section** - Full-width hero with heading, lead text, and CTA button
+- **Call to Action** - Colored background section with centered CTA
+- **Pricing Table** - 3-tier pricing cards (Basic, Pro, Enterprise)
+- **Feature Cards** - 3-column grid of feature cards
 
-**Feature Cards** - 3-column Bootstrap grid with cards
+#### Bootstrap 5 Layout Blocks
+- **Container** - Bootstrap container wrapper
+- **Row** - Bootstrap row
+- **Column** - Single column (col-md-6)
+- **2 Columns** - Pre-built 2-column layout
+- **3 Columns** - Pre-built 3-column layout
+- **4 Columns** - Pre-built 4-column layout
 
-**Call to Action** - Full-width section with primary button
+#### Bootstrap 5 Component Blocks
+- **Button** - Bootstrap button (btn btn-primary)
+- **Badge** - Colored badge label
+- **Alert** - Info alert box
+- **Breadcrumb** - Navigation breadcrumb
+- **Card with Image** - Bootstrap card with image, title, text, and button
+- **Accordion** - Collapsible accordion with 2 items
+- **Carousel** - Image carousel with 3 slides and controls
+- **List Group** - Vertical list of items
+- **Modal** - Modal dialog with trigger button
+- **Navbar** - Responsive navigation bar
+- **Progress Bar** - Progress bar (75%)
+- **Spinner** - Loading spinner
+- **Table** - Striped data table
+- **Tabs** - Tab navigation with content panels
+- **Toast** - Notification toast message
 
-**Pricing Table** - 3-tier pricing with Bootstrap cards
-
-**Container, Row, Column** - Basic Bootstrap 5 layout blocks
-
-**Button, Alert** - Standard Bootstrap 5 components
+All blocks use pure Bootstrap 5.3.2 classes with no custom CSS required.
 
 ### 5. FormBuilder Integration
 
