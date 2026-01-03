@@ -41,7 +41,7 @@ class TestPost extends BaseContent
     protected string $title;
 
     #[Field(
-        type: 'text',
+        type: 'pagebuilder',
         label: 'Post Content',
         translatable: true
     )]
