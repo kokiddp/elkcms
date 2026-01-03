@@ -95,6 +95,13 @@
                    value="{{ old($fieldName, isset($content) ? ($content->$fieldName ?? '') : '') }}"
                    {{ $field['required'] ? 'required' : '' }}>
 
+        @elseif($field["type"] === "pagebuilder")
+            <textarea name="{{ $fieldName }}"
+                      id="{{ $fieldName }}"
+                      data-field-type="pagebuilder"
+                      class="d-none"
+                      {{ $field["required"] ? "required" : "" }}>{{ old($fieldName, isset($content) ? ($content->$fieldName ?? "") : "") }}</textarea>
+
         @else
             {{-- Default to text input for unknown types --}}
             <input type="text"
