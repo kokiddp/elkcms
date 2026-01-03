@@ -662,7 +662,7 @@ class FormBuilder
 
         // Hidden textarea to store HTML
         $html .= sprintf(
-            '<textarea id="%s" name="%s" class="d-none" %s>%s</textarea>',
+            '<textarea id="%s" name="%s" data-field-type="pagebuilder" class="d-none" %s>%s</textarea>',
             $id,
             $name,
             $required,
