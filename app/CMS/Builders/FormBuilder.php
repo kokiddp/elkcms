@@ -253,6 +253,8 @@ class FormBuilder
             default => 'text',
         };
 
+        $errorInfo = $this->getFieldErrors($name);
+
         $html = '<div class="form-group mb-3">';
         $html .= sprintf('<label for="%s" class="form-label">%s%s</label>',
             $id,
@@ -260,8 +262,9 @@ class FormBuilder
             $required ? ' <span class="text-danger">*</span>' : ''
         );
         $html .= sprintf(
-            '<input type="%s" class="form-control" id="%s" name="%s" value="%s" %s %s %s>',
+            '<input type="%s" class="form-control%s" id="%s" name="%s" value="%s" %s %s %s>',
             $type,
+            $errorInfo['errorClass'],
             $id,
             $name,
             htmlspecialchars($value ?? '', ENT_QUOTES),
@@ -269,6 +272,8 @@ class FormBuilder
             $placeholder ? "placeholder=\"{$placeholder}\"" : '',
             $maxLength ? "maxlength=\"{$maxLength}\"" : ''
         );
+
+        $html .= $this->renderFieldError($name);
 
         if ($helpText) {
             $html .= sprintf('<div class="form-text">%s</div>', $helpText);
@@ -291,6 +296,8 @@ class FormBuilder
         $helpText = $fieldMeta['helpText'] ?? '';
         $rows = $fieldMeta['rows'] ?? 5;
 
+        $errorInfo = $this->getFieldErrors($name);
+
         $html = '<div class="form-group mb-3">';
         $html .= sprintf('<label for="%s" class="form-label">%s%s</label>',
             $id,
@@ -298,7 +305,8 @@ class FormBuilder
             $required ? ' <span class="text-danger">*</span>' : ''
         );
         $html .= sprintf(
-            '<textarea class="form-control" id="%s" name="%s" rows="%d" %s %s>%s</textarea>',
+            '<textarea class="form-control%s" id="%s" name="%s" rows="%d" %s %s>%s</textarea>',
+            $errorInfo['errorClass'],
             $id,
             $name,
             $rows,
@@ -306,6 +314,8 @@ class FormBuilder
             $placeholder ? "placeholder=\"{$placeholder}\"" : '',
             htmlspecialchars($value ?? '', ENT_QUOTES)
         );
+
+        $html .= $this->renderFieldError($name);
 
         if ($helpText) {
             $html .= sprintf('<div class="form-text">%s</div>', $helpText);
@@ -691,5 +701,43 @@ class FormBuilder
     protected function getFieldId(string $name): string
     {
         return 'field-' . str_replace(['[', ']', '.'], ['-', '', '-'], $name);
+    }
+
+    /**
+     * Get validation error information for a field
+     *
+     * @param string $name Field name
+     * @return array ['hasError' => bool, 'errorClass' => string, 'errorMessage' => string|null]
+     */
+    protected function getFieldErrors(string $name): array
+    {
+        $errors = session()->get('errors');
+        $hasError = $errors && $errors->has($name);
+
+        return [
+            'hasError' => $hasError,
+            'errorClass' => $hasError ? ' is-invalid' : '',
+            'errorMessage' => $hasError ? $errors->first($name) : null,
+        ];
+    }
+
+    /**
+     * Render validation error message for a field
+     *
+     * @param string $name Field name
+     * @return string Error HTML or empty string
+     */
+    protected function renderFieldError(string $name): string
+    {
+        $errorInfo = $this->getFieldErrors($name);
+
+        if (!$errorInfo['hasError']) {
+            return '';
+        }
+
+        return sprintf(
+            '<div class="invalid-feedback d-block">%s</div>',
+            htmlspecialchars($errorInfo['errorMessage'])
+        );
     }
 }
