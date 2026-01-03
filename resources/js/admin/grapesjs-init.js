@@ -14,9 +14,11 @@ import presetWebpage from 'grapesjs-preset-webpage';
  */
 export function initGrapesJS() {
     // Find all pagebuilder textareas
+    console.log("[GrapesJS] Initializing for", pagebuilderFields.length, "fields");
     const pagebuilderFields = document.querySelectorAll('textarea[data-field-type="pagebuilder"]');
     
     pagebuilderFields.forEach((textarea) => {
+        console.log("[GrapesJS] Found field:", textarea.id);
         const editorId = textarea.id + '-editor';
         const initialContent = textarea.value || '';
         
