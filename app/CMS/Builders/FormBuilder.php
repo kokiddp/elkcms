@@ -122,6 +122,7 @@ class FormBuilder
         switch ($type) {
             case 'string':
             case 'text':
+            case 'pagebuilder':
                 $rules[] = 'string';
                 if (isset($fieldMeta['maxLength'])) {
                     $rules[] = "max:{$fieldMeta['maxLength']}";
@@ -650,7 +651,7 @@ class FormBuilder
     }
 
     /**
-     * Render page builder field (GrapesJS)
+     * Render page builder field (Gutenberg)
      */
     protected function renderPageBuilderField(string $name, mixed $value, array $fieldMeta): string
     {
@@ -670,7 +671,7 @@ class FormBuilder
             $html .= sprintf('<div class="form-text mb-2">%s</div>', $helpText);
         }
 
-        // Hidden textarea - GrapesJS editor will be injected before this by JavaScript
+        // Hidden textarea - Gutenberg editor will be injected before this by JavaScript
         $html .= sprintf(
             '<textarea id="%s" name="%s" data-field-type="pagebuilder" class="d-none" %s>%s</textarea>',
             $id,

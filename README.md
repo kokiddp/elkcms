@@ -37,11 +37,11 @@ ELKCMS is a modern content management system that combines the power of Laravel 
 - **Unused Media Detection**: Find and clean up orphaned files
 
 ### Visual Page Builder
-- **GrapesJS Integration**: Gutenberg-like block editor
+- **Gutenberg Integration (Isolated Block Editor)**: Block editor for pagebuilder fields
 - **Bootstrap Blocks**: Pre-built components (hero, cards, grids, etc.)
 - **Responsive Design**: Mobile-first editing experience
 - **Custom Blocks**: Easy to add your own components
-- **No Lock-In**: Content stored as clean JSON, easily portable
+- **No Lock-In**: Content stored as clean HTML, easily portable
 
 ### Performance Oriented
 - **File/Database Caching**: Aggressive multi-layer caching strategy (no Redis required)
@@ -75,24 +75,24 @@ ELKCMS is under active development with a **solid foundation** and **functional 
 - ✅ **Phase 2:** Translation System (Database-backed multilingual support, N+1 optimization)
 - ✅ **Phase 3:** Services & Repositories (TranslationService, ContentRepository, LocaleMiddleware)
 - 🟡 **Phase 4:** Admin Interface (Auth, Dashboard, Content CRUD) - **Partial**
-- **Testing:** 289 tests passing (692 assertions, 100% pass rate)
+- **Testing:** 313 tests passing (777 assertions, 100% pass rate)
 
 ### What Works Today ✅
 - **Backend:** Attribute-driven content models, translation engine, performance optimization
 - **Admin:** WordPress-inspired dashboard, content CRUD, role-based access (5 roles, 18 permissions)
+- **Editor:** Gutenberg (Isolated Block Editor) pagebuilder fields with on-demand assets
 - **Quality:** SCSS architecture, reusable Blade components, comprehensive testing
 
 ### What's Missing (60% → 100%) 🔴
 - **FormBuilder Service** - Dynamic form generation from attributes
 - **Frontend Routes & Views** - Public website (0% complete)
-- **GrapesJS Integration** - Visual page builder
 - **Translation Management UI** - Currently requires code/Tinker
 - **Media Upload Processing** - Image upload handling
 - **User Management UI** - Admin panel for users/roles
 
 ### Production Roadmap 📋
 See [SPRINT_PLAN.md](SPRINT_PLAN.md) for the complete 3-sprint roadmap:
-- **Sprint 1:** FormBuilder + Frontend + GrapesJS + Media (5 days) → 75% ready
+- **Sprint 1:** FormBuilder + Frontend + Visual Builder + Media (5 days) → 75% ready
 - **Sprint 2:** Translation UI + Users + Settings + Taxonomy (6 days) → 90% ready
 - **Sprint 3:** Media Library + Bulk Actions + Revisions + Menus (5 days) → 100% ready
 
@@ -516,7 +516,7 @@ ELKCMS is open-sourced software licensed under the [MIT license](LICENSE).
 Built with love using:
 - [Laravel](https://laravel.com/)
 - [Bootstrap](https://getbootstrap.com/)
-- [GrapesJS](https://grapesjs.com/)
+- [Isolated Block Editor](https://github.com/Automattic/isolated-block-editor)
 - [Intervention Image](http://image.intervention.io/)
 - [Vite](https://vitejs.dev/)
 

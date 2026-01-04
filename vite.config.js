@@ -5,6 +5,10 @@ import { dirname, resolve } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const wpPrivateApisPath = resolve(
+    __dirname,
+    'node_modules/@automattic/isolated-block-editor/node_modules/@wordpress/commands/node_modules/@wordpress/private-apis'
+);
 
 export default defineConfig({
     plugins: [
@@ -21,8 +25,9 @@ export default defineConfig({
     resolve: {
         alias: {
             '~bootstrap': resolve(__dirname, 'node_modules/bootstrap'),
-            '~grapesjs': resolve(__dirname, 'node_modules/grapesjs'),
-        }
+            '@wordpress/private-apis': wpPrivateApisPath,
+        },
+        dedupe: ['@wordpress/private-apis', 'react', 'react-dom'],
     },
     server: {
         host: '0.0.0.0',
@@ -42,7 +47,6 @@ export default defineConfig({
             output: {
                 manualChunks: {
                     'vendor': ['bootstrap', '@popperjs/core'],
-                    'grapes': ['grapesjs', 'grapesjs-preset-webpage'],
                     'chart': ['chart.js'],
                 },
             },

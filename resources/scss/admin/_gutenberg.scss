@@ -1,0 +1,41 @@
+/**
+ * Gutenberg Block Editor Styles
+ *
+ * Imports required styles for WordPress Gutenberg editor
+ */
+
+// Import Gutenberg editor styles from the isolated block editor bundle
+@import '../../../node_modules/@automattic/isolated-block-editor/build-browser/core.css';
+@import '../../../node_modules/@automattic/isolated-block-editor/build-browser/isolated-block-editor.css';
+
+// Custom adjustments for Bootstrap 5 compatibility
+.gutenberg-editor-wrapper {
+    min-height: 80vh;
+
+    // Reset box-sizing for Gutenberg
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    // Ensure proper spacing
+    .block-editor-block-list__layout {
+        padding: 16px;
+    }
+
+    .iso-editor,
+    .interface-interface-skeleton,
+    .interface-interface-skeleton__content,
+    .interface-interface-skeleton__editor,
+    .edit-post-visual-editor,
+    .block-editor-writing-flow {
+        min-height: inherit;
+    }
+
+    .interface-interface-skeleton,
+    .interface-interface-skeleton__content,
+    .interface-interface-skeleton__editor {
+        height: 100%;
+    }
+}

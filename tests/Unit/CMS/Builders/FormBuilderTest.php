@@ -258,7 +258,9 @@ class FormBuilderTest extends TestCase
 
         $html = $this->formBuilder->buildField('page_content', '<div>Page HTML</div>', $fieldMeta);
 
-        $this->assertStringContainsString('id="gjs-', $html);
+        $this->assertStringContainsString('id="field-page_content"', $html);
+        $this->assertStringContainsString('name="page_content"', $html);
+        $this->assertStringContainsString('data-field-type="pagebuilder"', $html);
         $this->assertStringContainsString('Page Content', $html);
         $this->assertStringContainsString('&lt;div&gt;Page HTML&lt;/div&gt;', $html);
     }

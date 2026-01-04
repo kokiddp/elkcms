@@ -106,6 +106,7 @@ class FieldAnalyzer
         return match ($type) {
             'string' => 'text',
             'text' => 'textarea',
+            'pagebuilder' => 'pagebuilder',
             'integer' => 'number',
             'boolean' => 'checkbox',
             'date' => 'date',
@@ -138,6 +139,7 @@ class FieldAnalyzer
                 ? "\$table->string('{$name}', {$fieldDefinition['maxLength']})"
                 : "\$table->string('{$name}')",
             'text' => "\$table->text('{$name}')",
+            'pagebuilder' => "\$table->text('{$name}')",
             'integer' => "\$table->integer('{$name}')",
             'boolean' => "\$table->boolean('{$name}')",
             'date' => "\$table->date('{$name}')",

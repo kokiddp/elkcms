@@ -10,7 +10,7 @@ class Field
     /**
      * Create a new Field attribute instance.
      *
-     * @param  string  $type  Field type (string, text, integer, boolean, date, datetime, image, file, json, etc.)
+     * @param  string  $type  Field type (string, text, pagebuilder, integer, boolean, date, datetime, image, file, json, etc.)
      * @param  string|null  $label  Human-readable label for the field (defaults to property name)
      * @param  bool  $required  Whether this field is required
      * @param  bool  $translatable  Whether this field supports translations
@@ -64,6 +64,7 @@ class Field
         match ($this->type) {
             'string' => $rules[] = 'string',
             'text' => $rules[] = 'string',
+            'pagebuilder' => $rules[] = 'string',
             'integer' => $rules[] = 'integer',
             'boolean' => $rules[] = 'boolean',
             'date' => $rules[] = 'date',
@@ -108,6 +109,7 @@ class Field
         return match ($this->type) {
             'string' => $this->maxLength ? "string:{$this->maxLength}" : 'string',
             'text' => 'text',
+            'pagebuilder' => 'text',
             'integer' => 'integer',
             'boolean' => 'boolean',
             'date' => 'date',

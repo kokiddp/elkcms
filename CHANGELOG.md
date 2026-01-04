@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **GrapesJS Integration:** See [GRAPESJS_INTEGRATION.md](GRAPESJS_INTEGRATION.md) and [GRAPESJS_UI_REDESIGN.md](GRAPESJS_UI_REDESIGN.md) for visual builder docs.
 > **Phase Reviews:** [PHASE2_REVIEW.md](PHASE2_REVIEW.md), [PHASE3_REVIEW.md](PHASE3_REVIEW.md), [PHASE4_PLAN.md](PHASE4_PLAN.md)
 
+### Gutenberg Integration Fixes (2026-01-04) ✅
+
+- ✅ **Isolated Block Editor Stability** - Unified `@wordpress/private-apis` resolution to prevent unlock errors
+- ✅ **Editor Initialization** - Added double-init guard and raw HTML load handling
+- ✅ **Vite Compatibility** - Load the browser bundle with React/ReactDOM UMD to avoid Node-only module errors
+- ✅ **Styling** - Switched to bundled isolated block editor CSS
+- ✅ **Editor UX** - Suppressed upstream deprecation warnings and increased editor height
+- ✅ **Asset Loading** - Gutenberg styles load on-demand only when pagebuilder fields exist
+- ✅ **Build Fix** - Resolved Sass import ambiguity for the on-demand Gutenberg stylesheet
+- ✅ **Pagebuilder Field Type** - Treat pagebuilder as text for validation and migrations
+- **Testing:** ✅ 313 tests passing (777 assertions)
+
 ### GrapesJS Visual Page Builder Complete (2026-01-03) ✅
 
 **Sprint 1, Step 2 - Production Ready**

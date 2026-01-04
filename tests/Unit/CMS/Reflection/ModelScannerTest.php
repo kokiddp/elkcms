@@ -82,7 +82,7 @@ class ModelScannerTest extends TestCase
         $result = $this->scanner->scan(TestPost::class, useCache: false);
         $content = $result['fields']['content'];
 
-        $this->assertEquals('text', $content['type']);
+        $this->assertEquals('pagebuilder', $content['type']);
         $this->assertEquals('Post Content', $content['label']);
         $this->assertFalse($content['required']);
         $this->assertTrue($content['translatable']);

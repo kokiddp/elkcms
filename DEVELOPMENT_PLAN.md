@@ -1,8 +1,8 @@
 # ELKCMS Development Plan v2
 
-**Last Updated:** 2026-01-02
+**Last Updated:** 2026-01-04
 **Current Status:** Phase 4 Partial ✅ (60% Production-Ready)
-**Tests:** 289 passing (692 assertions)
+**Tests:** 313 passing (777 assertions)
 **Next Steps:** See [SPRINT_PLAN.md](SPRINT_PLAN.md) for 3-sprint production roadmap
 
 ---
@@ -30,7 +30,7 @@ ELKCMS is a high-performance, attribute-driven PHP CMS built on Laravel 11. The 
 | Phase 4 | 🟡 Partial | +31 | B | [PHASE4_PLAN.md](PHASE4_PLAN.md) |
 | Sprint 1-3 | 📋 Planned | +111 | - | [SPRINT_PLAN.md](SPRINT_PLAN.md) |
 
-**Total:** 289 tests, 692 assertions, 100% pass rate
+**Total:** 313 tests, 777 assertions, 100% pass rate
 **Production Ready:** 60% (3 sprints to 100%)
 
 ---
@@ -190,7 +190,7 @@ ELKCMS is a high-performance, attribute-driven PHP CMS built on Laravel 11. The 
 
 **Status:** 🟡 Partial Complete (Admin infra done, FormBuilder & features missing)
 **Completed:** 2026-01-02
-**Tests:** +31 tests (total: 289 passing)
+**Tests:** +31 tests (total: 313 passing)
 **Grade:** B (60% production-ready)
 **Documentation:** [PHASE4_PLAN.md](PHASE4_PLAN.md)
 
@@ -241,7 +241,7 @@ ELKCMS is a high-performance, attribute-driven PHP CMS built on Laravel 11. The 
 **Critical for Production:**
 1. **FormBuilder Service** - Forms currently hard-coded
 2. **Frontend Routes & Views** - No public website
-3. **GrapesJS Visual Builder** - No page builder integration
+3. **Gutenberg Visual Builder (Isolated Block Editor)** - Needs UX polish and block expansion
 4. **Translation Management UI** - Must use code/Tinker
 5. **Media Upload Handling** - Image uploads not processed
 6. **User Management UI** - Cannot manage users via admin
@@ -260,7 +260,7 @@ ELKCMS is a high-performance, attribute-driven PHP CMS built on Laravel 11. The 
 **Goal:** Make the CMS functional (→ 75% ready)
 
 - **FormBuilder Service** - Dynamic form generation from attributes
-- **GrapesJS Integration** - Visual page builder with Bootstrap 5
+- **Gutenberg Integration (Isolated Block Editor)** - Visual page builder with Bootstrap 5 styles
 - **Frontend Routes & Views** - Public website with SEO
 - **Media Upload Handling** - Working image uploads
 
@@ -295,7 +295,7 @@ ELKCMS is a high-performance, attribute-driven PHP CMS built on Laravel 11. The 
 
 | Sprint | Duration | Features | Tests | Ready |
 |--------|----------|----------|-------|-------|
-| Current | - | Admin infra only | 289 | 60% |
+| Current | - | Admin infra only | 313 | 60% |
 | Sprint 1 | 5 days | FormBuilder, Frontend, Media | +33 | 75% |
 | Sprint 2 | 6 days | Translation UI, Users, Taxonomy | +42 | 90% |
 | Sprint 3 | 5 days | Media Library, Revisions, Menus | +48 | 100% ✅ |
@@ -313,7 +313,7 @@ After all 3 sprints, ELKCMS will match/exceed WordPress:
 
 | Feature | ELKCMS | WordPress |
 |---------|--------|-----------|
-| **Visual Builder** | ✅ GrapesJS (Bootstrap 5) | Gutenberg (React) |
+| **Visual Builder** | ✅ Gutenberg (Isolated Block Editor) | Gutenberg (React) |
 | **Multilingual** | ✅ Built-in (database) | ❌ Requires plugins ($200+) |
 | **Custom Types** | ✅ PHP attributes (zero config) | Code or plugins |
 | **SEO** | ✅ Schema.org built-in | Requires plugins |
@@ -333,7 +333,7 @@ After all 3 sprints, ELKCMS will match/exceed WordPress:
 ### Core Documentation
 - **[SPRINT_PLAN.md](SPRINT_PLAN.md)** - 3-sprint roadmap to 100% production-ready (16 days, 96 hours)
 - **[CURRENT_STATUS.md](CURRENT_STATUS.md)** - Detailed status assessment and gap analysis
-- **[GRAPESJS_INTEGRATION.md](GRAPESJS_INTEGRATION.md)** - Complete GrapesJS visual builder implementation guide
+- **[GRAPESJS_INTEGRATION.md](GRAPESJS_INTEGRATION.md)** - Legacy GrapesJS visual builder guide (superseded by Gutenberg IBE)
 - **[PHASE4_PLAN.md](PHASE4_PLAN.md)** - Admin interface implementation details
 - **[ERROR_HANDLING.md](ERROR_HANDLING.md)** - Comprehensive error handling strategy
 - **[CACHING.md](CACHING.md)** - Cache key formats, TTLs, invalidation patterns
@@ -351,6 +351,6 @@ After all 3 sprints, ELKCMS will match/exceed WordPress:
 
 ---
 
-**Last Updated:** 2026-01-02
+**Last Updated:** 2026-01-04
 **Maintained By:** Development Team
 **Review Cycle:** After each sprint completion
