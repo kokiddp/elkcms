@@ -3,14 +3,14 @@
  */
 
 import 'bootstrap';
-import { initGrapesJS } from './grapesjs-init';
+import { initGutenberg } from './gutenberg-init';
 
 console.log('ELKCMS Admin loaded');
 
 // Initialize admin modules
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Admin panel ready');
-    
-    // Initialize GrapesJS for pagebuilder fields
-    initGrapesJS();
+
+    // Initialize Gutenberg Block Editor for pagebuilder fields
+    initGutenberg();
 });
